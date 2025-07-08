@@ -2,12 +2,12 @@ import { useState, useContext } from "react";
 import { getAuth, signOut } from "firebase/auth";
 import { firebaseAuth } from "../../services/firebase";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../../contexts/UserContext";
+import { useUser } from "../../contexts/UserContext";
 
 const LogOut = () => {
-    const { user, setUser } = useContext(UserContext);
+    const { user, setUser } = useUser();
     const [message, setMessage] = useState("");
-    const navigate = useNavigate;
+    const navigate = useNavigate();
 
     if (!user) return null;
 
@@ -17,7 +17,7 @@ const LogOut = () => {
                 setUser(null);
                 console.log("user logged out");
                 setMessage("You have logged out successfully");
-                navigate("./");
+                navigate("/");
             })
             .catch((err) => {
                 setMessage("Error logging you out");

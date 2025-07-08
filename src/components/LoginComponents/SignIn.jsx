@@ -2,10 +2,10 @@ import { useState, useContext } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { firebaseAuth } from "../../services/firebase";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../../contexts/UserContext";
+import { useUser } from "../../contexts/UserContext";
 
 const SignIn = () => {
-    const { user, setUser } = useContext(UserContext);
+    const { user, setUser } = useUser();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
@@ -18,11 +18,12 @@ const SignIn = () => {
                 const user = userCredential.user;
                 console.log(user);
                 setUser(user);
-                navigate("./create");
+                navigate("/create");
             })
             .catch((err) => {
                 const errorCode = err.code;
                 const errorMessage = err.message;
+                console.log(errorCode, errorMessage);
             });
     };
 
@@ -32,13 +33,13 @@ const SignIn = () => {
                 <h1>Sign In</h1>
                 <label>Email</label>
                 <input
-                    type="text"
+                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
                 <label>Password</label>
                 <input
-                    type="text"
+                    type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
