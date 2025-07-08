@@ -9,8 +9,10 @@ import Toolbar from "../components/Toolbar";
 import DraggableImage from "../components/DraggableImage";
 import EditableText from "../components/EditableText";
 import LogOut from "../components/LoginComponents/LogOut";
-
+import ToolbarPlaceholder from "../components/placeholderForCSS";
+import "../components/toolBar.css";
 const CreateBoard = () => {
+
     const [elements, setElements] = useState([]);
     const [date, setDate] = useState("2025-07-08");
 
@@ -29,24 +31,26 @@ const CreateBoard = () => {
         }
     }, [user, date]);
 
-    const handleAddElement = useCallback((elementType, elementData) => {
-        const newElement = {
-            id: uuidv4(),
-            type: elementType,
-            ...elementData,
-            x: 200,
-            y: 200,
-        };
-        setElements((prev) => [...prev, newElement]);
-    }, []);
 
-    const handleTextChange = (id, newText) => {
-        setElements((prev) =>
-            prev.map((element) =>
-                element.id === id ? { ...element, text: newText } : element
-            )
-        );
+  const stageRef = useRef();
+
+  const handleAddElement = useCallback((elementType, elementData) => {
+    const newElement = {
+      id: uuidv4(),
+      type: elementType,
+      ...elementData,
+      x: 200,
+      y: 200,
     };
+    setElements((prev) => [...prev, newElement]);
+  }, []);
+
+  const handleTextChange = (id, newText) => {
+    setElements((prev) =>
+      prev.map((element) =>
+        element.id === id ? { ...element, text: newText } : element
+      )
+
 
     const handleUpdateElement = (id, updates) => {
         setElements((prev) =>
@@ -71,8 +75,9 @@ const CreateBoard = () => {
         }
     };
     return (
-        <>
+        <div className="create-board-page">
             <LogOut />
+      
             <button onClick={handleSaveBoard}>Save 💾</button>
             <label htmlFor="boardDate">Select Date:</label>
             <input
@@ -81,6 +86,7 @@ const CreateBoard = () => {
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
             />
+<ToolbarPlaceholder />
             <Toolbar
                 onAddText={() => handleAddElement("text", { text: "New Text" })}
                 onAddImage={() => handleAddElement("image")}
@@ -125,8 +131,10 @@ const CreateBoard = () => {
                     })}
                 </Layer>
             </Stage>
-        </>
+        </div>
+
     );
-};
+  };
+
 
 export default CreateBoard;

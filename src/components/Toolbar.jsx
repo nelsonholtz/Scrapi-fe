@@ -1,3 +1,6 @@
+
+import "./toolBar.css";
+
 const Toolbar = ({ onAddText, onAddImage }) => {
     return (
         <div style={{ top: 10, left: 10, zIndex: 100 }}>
@@ -5,6 +8,7 @@ const Toolbar = ({ onAddText, onAddImage }) => {
             <button onClick={onAddImage}>Add chunky cat</button>
         </div>
     );
+
 };
 
 export default Toolbar;
