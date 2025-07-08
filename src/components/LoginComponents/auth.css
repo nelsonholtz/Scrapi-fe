@@ -1,0 +1,79 @@
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap");
+
+.script-text {
+  font-family: "Dancing Script", cursive;
+}
+:root {
+  --oxford-blue: #14213d;
+  --orange-web: #fca311;
+  --platinum: #e5e5e5;
+}
+.auth {
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 30px 40px;
+  background-color: var(--oxford-blue);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  color: var(--platinum);
+  font-family: "Helvetica Neue", sans-serif;
+}
+.auth h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: var(--orange-web);
+  font-size: 1.8rem;
+}
+.auth label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--platinum);
+}
+.auth input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--orange-web);
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  background-color: transparent;
+  color: var(--platinum);
+}
+.auth input::placeholder {
+  color: #ccc;
+}
+
+.auth button {
+  width: 100%;
+  background-color: var(--orange-web);
+  color: var(--oxford-blue);
+  border: none;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.auth button:hover {
+  background-color: #ffb703;
+}
+.logout-button {
+  background-color: var(--orange-web);
+  color: var(--oxford-blue);
+  border: none;
+  padding: 10px 16px;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: block;
+  margin: 30px auto;
+  font-weight: 600;
+}
+
+.logout-button:hover {
+  background-color: #ffb703;
+}

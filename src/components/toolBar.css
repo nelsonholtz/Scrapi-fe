@@ -1,0 +1,38 @@
+:root {
+  --oxford-blue: #14213d;
+  --orange-web: #fca311;
+  --platinum: #e5e5e5;
+  --nude-bg: #f5f3f0;
+}
+
+.toolbar-placeholder {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  background-color: var(--platinum);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(20, 33, 61, 0.2);
+  display: flex;
+  gap: 12px;
+  z-index: 100;
+  border: 2px solid var(--oxford-blue);
+}
+
+.toolbar-placeholder .fake-button {
+  background-color: var(--orange-web);
+  border: none;
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 1rem;
+  color: var(--platinum);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(252, 163, 17, 0.6);
+  transition: background-color 0.3s ease;
+}
+.toolbar-placeholder .fake-button:hover {
+  background-color: var(--oxford-blue);
+  color: var(--platinum);
+  box-shadow: 0 2px 8px rgba(20, 33, 61, 0.8);
+}
