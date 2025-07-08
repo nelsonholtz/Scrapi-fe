@@ -1,8 +1,13 @@
-import { Stage, Layer, Image, Transformer } from "react-konva";
+import { Stage, Layer, Image, Transformer, Rect, Text } from "react-konva";
 import useImage from "use-image";
 import { useRef, useEffect, useState } from "react";
 
 const DraggableImage = () => {
+  const [position, setPosition] = useState({ x: 20, y: 20 });
+  // We use refs to keep history to avoid unnecessary re-renders
+  const history = useRef([{ x: 20, y: 20 }]);
+  const historyStep = useRef(0);
+
   const [image] = useImage(
     "https://images.pexels.com/photos/1170986/pexels-photo-1170986.jpeg"
   );
@@ -10,10 +15,23 @@ const DraggableImage = () => {
   const imageRef = useRef();
   const transformerRef = useRef();
 
-  const [state, setState] = useState({
-    x: 10,
-    y: 10,
-  });
+  const handleUndo = () => {
+    if (historyStep.current === 0) {
+      return;
+    }
+    historyStep.current -= 1;
+    const previous = history.current[historyStep.current];
+    setPosition(previous);
+  };
+
+  const handleRedo = () => {
+    if (historyStep.current === history.current.length - 1) {
+      return;
+    }
+    historyStep.current += 1;
+    const next = history.current[historyStep.current];
+    setPosition(next);
+  };
 
   useEffect(() => {
     if (image && imageRef.current && transformerRef.current) {
@@ -23,17 +41,24 @@ const DraggableImage = () => {
   }, [image]);
 
   const handleDragEnd = (e) => {
-    setState({
+    history.current = history.current.slice(0, historyStep.current + 1);
+    const pos = {
       x: e.target.x(),
       y: e.target.y(),
-    });
+    };
+    // Push the new state
+    history.current = history.current.concat([pos]);
+    historyStep.current += 1;
+    setPosition(pos);
   };
 
   return (
     <>
+      <Text text="undo" onClick={handleUndo} />
+      <Text text="redo" x={40} onClick={handleRedo} />
       <Image
-        x={state.x}
-        y={state.y}
+        x={position.x}
+        y={position.y}
         width={100}
         height={100}
         image={image}
