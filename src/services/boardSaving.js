@@ -1,9 +1,11 @@
 import {
+    getDocs,
+    query,
+    collection,
+    where,
     doc,
     getDoc,
     setDoc,
-    collection,
-    addDoc,
     serverTimestamp,
 } from "firebase/firestore";
 import { db } from "./firebase";
@@ -37,4 +39,20 @@ export const getUserBoard = async (userId, date) => {
     } else {
         return null;
     }
+};
+
+export const getUserBoardDates = async (userId) => {
+    if (!userId) throw new Error("No user id");
+
+    const q = query(collection(db, "boards"), where("userId", "==", userId));
+    const allBoards = await getDocs(q);
+
+    const dates = [];
+    allBoards.forEach((doc) => {
+        const data = doc.data();
+        if (data.date) {
+            dates.push(data.date);
+        }
+    });
+    return dates;
 };
