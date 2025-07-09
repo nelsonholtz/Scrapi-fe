@@ -6,6 +6,7 @@ const Toolbar = ({
     onAddImage,
     onUndo,
     onRedo,
+    onOpenStickerLibrary,
     onUploadingComplete,
 }) => {
     return (
@@ -15,6 +16,7 @@ const Toolbar = ({
             <button onClick={onUndo}>Undo</button>
             <button onClick={onRedo}>Redo</button>
             <ImageUploader onUploadingComplete={onUploadingComplete} />
+            <button onClick={onOpenStickerLibrary}>Add Sticker</button>
         </div>
     );
 };

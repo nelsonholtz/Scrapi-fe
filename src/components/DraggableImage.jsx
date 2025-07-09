@@ -11,6 +11,8 @@ const DraggableImage = ({
     scaleY = 1,
     rotation = 0,
     onUpdate,
+    selected,
+    onSelect,
 }) => {
     const [position, setPosition] = useState({
         x,
@@ -50,11 +52,11 @@ const DraggableImage = ({
     };
 
     useEffect(() => {
-        if (image && imageRef.current && transformerRef.current) {
+        if (selected && image && imageRef.current && transformerRef.current) {
             transformerRef.current.nodes([imageRef.current]);
             transformerRef.current.getLayer().batchDraw();
         }
-    }, [image]);
+    }, [image, selected]);
 
     const handleDragEnd = (e) => {
         history.current = history.current.slice(0, historyStep.current + 1);
@@ -102,18 +104,21 @@ const DraggableImage = ({
                 height={100}
                 image={image}
                 draggable
+                onClick={onSelect}
                 onDragEnd={handleDragEnd}
                 ref={imageRef}
                 onTransformStart={() => {}}
                 onTransform={() => {}}
                 onTransformEnd={handleTransformEnd}
             />
-            <Transformer
-                ref={transformerRef}
-                onTransformStart={() => {}}
-                onTransform={() => {}}
-                onTransformEnd={() => {}}
-            />
+            {selected && (
+                <Transformer
+                    ref={transformerRef}
+                    onTransformStart={() => {}}
+                    onTransform={() => {}}
+                    onTransformEnd={() => {}}
+                />
+            )}
         </>
     );
 };

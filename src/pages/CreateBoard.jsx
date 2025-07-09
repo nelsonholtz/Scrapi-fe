@@ -10,10 +10,14 @@ import DraggableImage from "../components/DraggableImage";
 import EditableText from "../components/EditableText";
 import LogOut from "../components/LoginComponents/LogOut";
 import ToolbarPlaceholder from "../components/placeholderForCSS";
+import StickerLibrary from "../components/StickerLibrary";
 import "../components/toolBar.css";
+
 const CreateBoard = () => {
+    const [selectedId, setSelectedId] = useState(null);
     const [elements, setElements] = useState([]);
     const [date, setDate] = useState("2025-07-08");
+    const [showStickerLibrary, setShowStickerLibrary] = useState(false);
 
     const stageRef = useRef();
     const { user } = useUser();
@@ -102,8 +106,13 @@ const CreateBoard = () => {
                 onAddText={() => handleAddElement("text", { text: "New Text" })}
                 onAddImage={() => handleAddElement("image")}
                 onUploadingComplete={handleAddImageElement}
+                onOpenStickerLibrary={() => setShowStickerLibrary(true)}
             />
-
+            <StickerLibrary
+                isOpen={showStickerLibrary}
+                onClose={() => setShowStickerLibrary(false)}
+                onSelectSticker={(src) => handleAddElement("image", { src })}
+            />
             <Stage
                 ref={stageRef}
                 width={window.innerWidth}
@@ -137,6 +146,8 @@ const CreateBoard = () => {
                                     scaleY={element.scaleY}
                                     rotation={element.rotation}
                                     onUpdate={handleUpdateElement}
+                                    selected={selectedId === element.id}
+                                    onSelect={() => setSelectedId(element.id)}
                                 />
                             );
                         }
