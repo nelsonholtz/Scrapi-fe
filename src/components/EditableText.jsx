@@ -2,10 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { Html } from "react-konva-utils";
 import TextComponent from "./TextComponent";
 
-const EditableText = ({ id, text, x, y, onChange, stageRef }) => {
-  const textNodeRef = useRef();
-  const [isEditing, setIsEditing] = useState(false);
-  const [value, setValue] = useState(text);
+const EditableText = ({ id, text, x, y, onChange, onUpdate, stageRef }) => {
+    const textNodeRef = useRef();
+    const [isEditing, setIsEditing] = useState(false);
+    const [value, setValue] = useState(text);
 
   const handleDoubleClick = ({ id, x, y, text }) => {
     setIsEditing(true);
@@ -30,16 +30,17 @@ const EditableText = ({ id, text, x, y, onChange, stageRef }) => {
     }
   }, [isEditing]);
 
-  return (
-    <>
-      <TextComponent
-        id={id}
-        x={x}
-        y={y}
-        text={value}
-        onDoubleClick={handleDoubleClick}
-        textRef={textNodeRef}
-      />
+    return (
+        <>
+            <TextComponent
+                id={id}
+                x={x}
+                y={y}
+                text={value}
+                onDoubleClick={handleDoubleClick}
+                textRef={textNodeRef}
+                onUpdate={onUpdate}
+            />
 
       {isEditing && (
         <Html>

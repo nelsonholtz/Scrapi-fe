@@ -2,7 +2,14 @@ import { Stage, Layer, Image, Transformer } from "react-konva";
 import useImage from "use-image";
 import { useRef, useEffect } from "react";
 
-const DraggableImage = ({ position, setPosition, history, historyStep }) => {
+const DraggableImage = ({
+  position,
+  setPosition,
+  history,
+  historyStep,
+  onUpdate,
+  id,
+}) => {
   const [image] = useImage(
     "https://images.pexels.com/photos/1170986/pexels-photo-1170986.jpeg"
   );
@@ -29,6 +36,7 @@ const DraggableImage = ({ position, setPosition, history, historyStep }) => {
     history.current.push(pos);
     historyStep.current += 1;
     setPosition(pos);
+    onUpdate?.(id, pos);
   };
 
   const handleTransformEnd = (e) => {
@@ -43,6 +51,7 @@ const DraggableImage = ({ position, setPosition, history, historyStep }) => {
     history.current.push(pos);
     historyStep.current += 1;
     setPosition(pos);
+    onUpdate?.(id, pos);
   };
 
   return (
@@ -67,3 +76,4 @@ const DraggableImage = ({ position, setPosition, history, historyStep }) => {
 };
 
 export default DraggableImage;
+

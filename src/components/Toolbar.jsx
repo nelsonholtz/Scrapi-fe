@@ -1,11 +1,14 @@
-const Toolbar = ({ onAddText, onUndo, onRedo }) => {
-  return (
-    <div style={{ position: "absolute", top: 10, left: 10, zIndex: 100 }}>
-      <button onClick={onAddText}>Add Text</button>
-      <button onClick={onUndo}>Undo</button>
+import "./toolBar.css";
+
+const Toolbar = ({ onAddText, onAddImage, onUndo, onRedo }) => {
+    return (
+        <div style={{ top: 10, left: 10, zIndex: 100 }}>
+            <button onClick={onAddText}>Add Text</button>
+            <button onClick={onAddImage}>Add chunky cat</button>
+ <button onClick={onUndo}>Undo</button>
       <button onClick={onRedo}>Redo</button>
-    </div>
-  );
+        </div>
+    );
 };
 
 export default Toolbar;
