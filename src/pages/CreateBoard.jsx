@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Stage, Layer } from "react-konva";
 import { v4 as uuidv4 } from "uuid";
+
 import { useUser } from "../contexts/UserContext";
 import { saveBoard, getUserBoard } from "../services/boardSaving";
 
@@ -9,14 +10,25 @@ import Toolbar from "../components/Toolbar";
 import DraggableImage from "../components/DraggableImage";
 import EditableText from "../components/EditableText";
 import LogOut from "../components/LoginComponents/LogOut";
+
+import UndoRedo from "../components/Toolbar_components/UndoRedo";
+
 import ToolbarPlaceholder from "../components/placeholderForCSS";
 import "../components/toolBar.css";
-const CreateBoard = () => {
-    const [elements, setElements] = useState([]);
-    const [date, setDate] = useState("2025-07-08");
 
-    const stageRef = useRef();
+const { handleUndo, handleRedo } = UndoRedo;
+
+const CreateBoard = () => {
+  const [elements, setElements] = useState([]);
+    const [date, setDate] = useState("2025-07-08");
+  
+   const stageRef = useRef();
     const { user } = useUser();
+
+  const history = useRef([{ x: 20, y: 20, scaleX: 1, scaleY: 1, rotation: 0 }]);
+  const historyStep = useRef(0);
+  const [position, setPosition] = useState(history.current[0]);
+
 
     useEffect(() => {
         if (user && date) {
@@ -30,24 +42,23 @@ const CreateBoard = () => {
         }
     }, [user, date]);
 
-    const handleAddElement = useCallback((elementType, elementData) => {
-        const newElement = {
-            id: uuidv4(),
-            type: elementType,
-            ...elementData,
-            x: 200,
-            y: 200,
-        };
-        setElements((prev) => [...prev, newElement]);
-    }, []);
-
-    const handleTextChange = (id, newText) => {
-        setElements((prev) =>
-            prev.map((element) =>
-                element.id === id ? { ...element, text: newText } : element
-            )
-        );
+  const handleAddElement = useCallback((elementType, elementData) => {
+    const newElement = {
+      id: uuidv4(),
+      type: elementType,
+      ...elementData,
+      x: 200,
+      y: 200,
     };
+
+    setElements((prev) => [...prev, newElement]);
+  }, []);
+
+  const handleTextChange = (id, newText) => {
+    setElements((prev) =>
+      prev.map((element) =>
+        element.id === id ? { ...element, text: newText } : element
+      )
 
     const handleUpdateElement = (id, updates) => {
         setElements((prev) =>
@@ -87,6 +98,8 @@ const CreateBoard = () => {
             <Toolbar
                 onAddText={() => handleAddElement("text", { text: "New Text" })}
                 onAddImage={() => handleAddElement("image")}
+                 onUndo={() => handleUndo({ history, historyStep, setPosition })}
+        onRedo={() => handleRedo({ history, historyStep, setPosition })}
             />
 
             <Stage
@@ -115,12 +128,12 @@ const CreateBoard = () => {
                                 <DraggableImage
                                     key={element.id}
                                     id={element.id}
-                                    x={element.x}
-                                    y={element.y}
-                                    scaleX={element.scaleX}
-                                    scaleY={element.scaleY}
-                                    rotation={element.rotation}
+                                   
                                     onUpdate={handleUpdateElement}
+  position={position}
+            setPosition={setPosition}
+            history={history}
+            historyStep={historyStep}
                                 />
                             );
                         }
@@ -130,6 +143,6 @@ const CreateBoard = () => {
             </Stage>
         </div>
     );
-};
+  };
 
 export default CreateBoard;
