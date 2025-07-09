@@ -41,6 +41,20 @@ const CreateBoard = () => {
         setElements((prev) => [...prev, newElement]);
     }, []);
 
+    const handleAddImageElement = useCallback((imageUrl) => {
+        const newImageElement = {
+            id: uuidv4(),
+            type: "image",
+            src: imageUrl,
+            x: 200,
+            y: 200,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: 0,
+        };
+        setElements((prev) => [...prev, newImageElement]);
+    }, []);
+
     const handleTextChange = (id, newText) => {
         setElements((prev) =>
             prev.map((element) =>
@@ -87,6 +101,7 @@ const CreateBoard = () => {
             <Toolbar
                 onAddText={() => handleAddElement("text", { text: "New Text" })}
                 onAddImage={() => handleAddElement("image")}
+                onUploadingComplete={handleAddImageElement}
             />
 
             <Stage
@@ -115,6 +130,7 @@ const CreateBoard = () => {
                                 <DraggableImage
                                     key={element.id}
                                     id={element.id}
+                                    src={element.src}
                                     x={element.x}
                                     y={element.y}
                                     scaleX={element.scaleX}

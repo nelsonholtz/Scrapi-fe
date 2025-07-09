@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from "react";
 
 const DraggableImage = ({
     id,
+    src,
     x = 0,
     y = 0,
     scaleX = 1,
@@ -25,9 +26,7 @@ const DraggableImage = ({
     ]);
     const historyStep = useRef(0);
 
-    const [image] = useImage(
-        "https://images.pexels.com/photos/1170986/pexels-photo-1170986.jpeg"
-    );
+    const [image] = useImage(src);
 
     const imageRef = useRef();
     const transformerRef = useRef();
