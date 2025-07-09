@@ -19,7 +19,8 @@ import "../components/toolBar.css";
 const { handleUndo, handleRedo } = UndoRedo;
 
 const CreateBoard = () => {
-  const [elements, setElements] = useState([]);
+
+    const [elements, setElements] = useState([]);
     const [date, setDate] = useState("2025-07-08");
   
    const stageRef = useRef();
@@ -85,7 +86,7 @@ const CreateBoard = () => {
     return (
         <div className="create-board-page">
             <LogOut />
-
+      
             <button onClick={handleSaveBoard}>Save 💾</button>
             <label htmlFor="boardDate">Select Date:</label>
             <input
@@ -94,7 +95,7 @@ const CreateBoard = () => {
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
             />
-            <ToolbarPlaceholder />
+<ToolbarPlaceholder />
             <Toolbar
                 onAddText={() => handleAddElement("text", { text: "New Text" })}
                 onAddImage={() => handleAddElement("image")}
@@ -142,7 +143,10 @@ const CreateBoard = () => {
                 </Layer>
             </Stage>
         </div>
+
     );
   };
+  };
+
 
 export default CreateBoard;
