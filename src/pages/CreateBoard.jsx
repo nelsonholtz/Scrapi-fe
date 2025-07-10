@@ -25,9 +25,11 @@ const CreateBoard = () => {
         if (user && date) {
             getUserBoard(user.uid, date).then((board) => {
                 if (board) {
-                    setElements(board.elements);
+                    setElements(board.elements || []);
+                    setIsPublic(!!board.public);
                 } else {
                     setElements([]);
+                    setIsPublic(false);
                 }
             });
         }

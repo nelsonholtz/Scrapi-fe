@@ -23,46 +23,48 @@ const PostCard = ({ board }) => {
     const formattedUpdatedAt = updatedAt?.toDate?.().toLocaleString?.() || "";
 
     return (
-        <div className="">
+        <li>
             <div className="">
-                Created by: <span className="">{userId}</span>
-            </div>
-            <div className="">Board Date: {formattedDate}</div>
-            <div className="">Last Updated: {formattedUpdatedAt}</div>
+                <div className="">
+                    Created by: <span className="">{userId}</span>
+                </div>
+                <div className="">Board Date: {formattedDate}</div>
+                <div className="">Last Updated: {formattedUpdatedAt}</div>
 
-            <Stage width={600} height={600}>
-                <Layer>
-                    {elements.map((el) => {
-                        if (el.type === "text") {
-                            return (
-                                <Text
-                                    key={el.id}
-                                    text={el.text}
-                                    x={el.x}
-                                    y={el.y}
-                                    fontSize={12}
-                                    fill="black"
-                                />
-                            );
-                        }
-                        if (el.type === "image" && el.src) {
-                            return (
-                                <ImageElement
-                                    key={el.id}
-                                    src={el.src}
-                                    x={el.x}
-                                    y={el.y}
-                                    scaleX={el.scaleX}
-                                    scaleY={el.scaleY}
-                                    rotation={el.rotation}
-                                />
-                            );
-                        }
-                        return null;
-                    })}
-                </Layer>
-            </Stage>
-        </div>
+                <Stage width={600} height={600}>
+                    <Layer>
+                        {elements.map((el) => {
+                            if (el.type === "text") {
+                                return (
+                                    <Text
+                                        key={el.id}
+                                        text={el.text}
+                                        x={el.x}
+                                        y={el.y}
+                                        fontSize={12}
+                                        fill="black"
+                                    />
+                                );
+                            }
+                            if (el.type === "image" && el.src) {
+                                return (
+                                    <ImageElement
+                                        key={el.id}
+                                        src={el.src}
+                                        x={el.x}
+                                        y={el.y}
+                                        scaleX={el.scaleX}
+                                        scaleY={el.scaleY}
+                                        rotation={el.rotation}
+                                    />
+                                );
+                            }
+                            return null;
+                        })}
+                    </Layer>
+                </Stage>
+            </div>
+        </li>
     );
 };
 
