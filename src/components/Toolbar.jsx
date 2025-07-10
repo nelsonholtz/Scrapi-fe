@@ -1,4 +1,8 @@
-import "./toolBar.css";
+import "../styles/toolbar-update.css";
+import { FaUndo } from "react-icons/fa";
+import { FaRedo } from "react-icons/fa";
+import { BsTextareaT } from "react-icons/bs";
+
 import ImageUploader from "./ImageUploader";
 
 const Toolbar = ({
@@ -9,12 +13,26 @@ const Toolbar = ({
     onUploadingComplete,
 }) => {
     return (
-        <div style={{ top: 10, left: 10, zIndex: 100 }}>
-            <button onClick={onAddText}>Add Text</button>
-            <button onClick={onAddImage}>Add chunky cat</button>
-            <button onClick={onUndo}>Undo</button>
-            <button onClick={onRedo}>Redo</button>
-            <ImageUploader onUploadingComplete={onUploadingComplete} />
+        <div className="toolbar-container">
+            <ul className="toolbar-list">
+                <li>
+                    <button className="toolbar-button" onClick={onAddText}>
+                        <BsTextareaT />
+                    </button>
+                </li>
+                <li>
+                    <ImageUploader onUploadingComplete={onUploadingComplete} />
+                </li>
+            </ul>
+
+            <div className="side-toolbar-container">
+                <button className="toolbar-button" onClick={onUndo}>
+                    <FaUndo />
+                </button>
+                <button className="toolbar-button" onClick={onRedo}>
+                    <FaRedo />
+                </button>
+            </div>
         </div>
     );
 };
