@@ -8,8 +8,10 @@ import { saveBoard, getUserBoard } from "../services/boardSaving";
 import Toolbar from "../components/Toolbar";
 import DraggableImage from "../components/DraggableImage";
 import EditableText from "../components/EditableText";
-import LogOut from "../components/LoginComponents/LogOut";
+//import LogOut from "../components/LoginComponents/LogOut";
 import ToolbarPlaceholder from "../components/placeholderForCSS";
+import DatePicker from "../components/DatePicker";
+
 import StickerLibrary from "../components/StickerLibrary";
 import "../components/toolBar.css";
 
@@ -91,17 +93,9 @@ const CreateBoard = () => {
     };
     return (
         <div className="create-board-page">
-            <LogOut />
-
             <button onClick={handleSaveBoard}>Save 💾</button>
-            <label htmlFor="boardDate">Select Date:</label>
-            <input
-                type="date"
-                id="boardDate"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-            />
-            <ToolbarPlaceholder />
+            <DatePicker date={date} onDateChange={setDate} />
+
             <Toolbar
                 onAddText={() => handleAddElement("text", { text: "New Text" })}
                 onAddImage={() => handleAddElement("image")}
