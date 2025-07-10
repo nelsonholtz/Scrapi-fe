@@ -39,6 +39,8 @@ const CreateBoard = () => {
         setRedoStack([]); // Clear redo stack on new action
     }, []);
 
+        
+
     const handleAddElement = useCallback((elementType, elementData) => {
         const newElement = {
             id: uuidv4(),
@@ -55,15 +57,18 @@ const CreateBoard = () => {
 
     const handleTextChange = (id, newText) => {
         setElements((prev) => {
-          const newElements = prev.map((element) =>
-            element.id === id ? { ...element, text: newText } : element
+          const newElements = prev.map((el) =>
+            el.id === id ? { ...el, text: newText } : el
           );
-          pushToHistory(newElements); // 👈 Track typing in history
-          console.log(newElements);
+      
+          //Deep clone before saving to history so it captures the actual text
+          const cloned = JSON.parse(JSON.stringify(newElements));
+          setRedoStack([]); // Clear redo on typing
+          setHistory((prevHistory) => [...prevHistory, cloned]);
+      
           return newElements;
         });
       };
-      
 
     const handleUpdateElement = (id, updates) => {
         setElements((prev) => {
@@ -83,6 +88,7 @@ const CreateBoard = () => {
         setSelectedId(null);
     };
 
+            
     const handleUndo = () => {
         if (history.length === 0) return;
         const previous = history[history.length - 1];

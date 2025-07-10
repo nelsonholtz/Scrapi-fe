@@ -2,43 +2,29 @@ import { useRef, useEffect } from "react";
 import { Image, Transformer } from "react-konva";
 import useImage from "use-image";
 
-const DraggableImage = ({
-  id,
-  x,
-  y,
-  scaleX = 1,
-  scaleY = 1,
-  rotation = 0,
-  onUpdate,
-  isSelected,
-  onSelect
-}) => {
+const DraggableImage = ({ id, x, y, scaleX, scaleY, rotation, onUpdate, isSelected, onSelect }) => {
   const shapeRef = useRef();
   const trRef = useRef();
-  const [image] = useImage("https://media.istockphoto.com/id/1253123139/photo/a-frightened-surprised-red-cat-with-big-round-eyes-sits-on-the-couch.jpg?s=612x612&w=0&k=20&c=UiFHA2Sq252VEnPaSptoPlsQ7sMcV3QQ0zchc7TgN0M=");
+  const [image] = useImage(
+    "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?auto=format&fit=crop&w=300&q=80"
+  );
 
   useEffect(() => {
-    if (isSelected && trRef.current) {
+    // Attach transformer when selected
+    if (isSelected && trRef.current && shapeRef.current) {
       trRef.current.nodes([shapeRef.current]);
       trRef.current.getLayer().batchDraw();
     }
-  }, [isSelected]);
+  }, [isSelected, image]);
 
-  const handleTransformEnd = () => {
+  const handleDragTransformEnd = (e) => {
     const node = shapeRef.current;
-    const scaleX = node.scaleX();
-    const scaleY = node.scaleY();
-    const rotation = node.rotation();
-
-    node.scaleX(1);
-    node.scaleY(1);
-
     onUpdate(id, {
       x: node.x(),
       y: node.y(),
-      scaleX,
-      scaleY,
-      rotation,
+      scaleX: node.scaleX(),
+      scaleY: node.scaleY(),
+      rotation: node.rotation(),
     });
   };
 
@@ -54,9 +40,8 @@ const DraggableImage = ({
         rotation={rotation}
         draggable
         onClick={onSelect}
-        onTap={onSelect}
-        onDragEnd={handleTransformEnd}
-        onTransformEnd={handleTransformEnd}
+        onTransformEnd={handleDragTransformEnd}
+        onDragEnd={handleDragTransformEnd}
       />
       {isSelected && <Transformer ref={trRef} />}
     </>
