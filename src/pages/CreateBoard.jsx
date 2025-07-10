@@ -11,6 +11,7 @@ import EditableText from "../components/EditableText";
 import ToolbarPlaceholder from "../components/placeholderForCSS";
 import DatePicker from "../components/DatePicker";
 
+import StickerLibrary from "../components/StickerLibrary";
 import "../components/toolBar.css";
 
 const CreateBoard = () => {
@@ -21,6 +22,7 @@ const CreateBoard = () => {
     const [history, setHistory] = useState([]);
     const [redoStack, setRedoStack] = useState([]);
     const [isPublic, setIsPublic] = useState(false);
+    const [showStickerLibrary, setShowStickerLibrary] = useState(false);
 
     const stageRef = useRef();
     const { user } = useUser();
@@ -167,8 +169,13 @@ const CreateBoard = () => {
                 onRedo={handleRedo}
                 onDelete={handleDelete}
                 selectedId={selectedId}
+                onOpenStickerLibrary={() => setShowStickerLibrary(true)}
             />
-
+            <StickerLibrary
+                isOpen={showStickerLibrary}
+                onClose={() => setShowStickerLibrary(false)}
+                onSelectSticker={(src) => handleAddElement("image", { src })}
+            />
             <Stage
                 ref={stageRef}
                 width={window.innerWidth}

@@ -2,6 +2,7 @@ import "../styles/toolbar-update.css";
 import { FaUndo } from "react-icons/fa";
 import { FaRedo } from "react-icons/fa";
 import { BsTextareaT } from "react-icons/bs";
+import { RiEmojiStickerLine } from "react-icons/ri";
 
 import ImageUploader from "./ImageUploader";
 
@@ -9,7 +10,10 @@ const Toolbar = ({
     onAddText,
     onAddImage,
     onUndo,
-    onRedo, onDelete, selectedId,
+    onRedo,
+    onDelete,
+    selectedId,
+    onOpenStickerLibrary,
     onUploadingComplete,
 }) => {
     return (
@@ -24,16 +28,26 @@ const Toolbar = ({
                     <ImageUploader onUploadingComplete={onUploadingComplete} />
                 </li>
                 <li>
-                <button 
-                onClick={onDelete} 
-                disabled={!selectedId}
-                style={{ backgroundColor: selectedId ? "#f00" : "#ccc", color: "#fff" }}
-            >
-                Delete Selected
-            </button>
+                    <button
+                        onClick={onDelete}
+                        disabled={!selectedId}
+                        style={{
+                            backgroundColor: selectedId ? "#f00" : "#ccc",
+                            color: "#fff",
+                        }}
+                    >
+                        Delete Selected
+                    </button>
+                </li>
+                <li>
+                    <button
+                        className="toolbar-button"
+                        onClick={onOpenStickerLibrary}
+                    >
+                        <RiEmojiStickerLine />
+                    </button>
                 </li>
             </ul>
-
 
             <div className="side-toolbar-container">
                 <button className="toolbar-button" onClick={onUndo}>
