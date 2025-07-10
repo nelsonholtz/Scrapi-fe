@@ -1,13 +1,59 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Image, Transformer } from "react-konva";
 import useImage from "use-image";
 
-const DraggableImage = ({ id, x, y, scaleX, scaleY, rotation, onUpdate, isSelected, onSelect }) => {
-  const shapeRef = useRef();
-  const trRef = useRef();
-  const [image] = useImage(
-    "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?auto=format&fit=crop&w=300&q=80"
-  );
+const DraggableImage = ({
+    id,
+    src,
+    x = 0,
+    y = 0,
+    scaleX = 1,
+    scaleY = 1,
+    rotation = 0,
+    onUpdate,
+    onSelect,
+    isSelected
+}) => {
+    const shapeRef = useRef();
+    const trRef = useRef();
+    const [position, setPosition] = useState({
+        x,
+        y,
+        scaleX,
+        scaleY,
+        rotation,
+    });
+
+    
+
+    // We use refs to keep history to avoid unnecessary re-renders
+    const history = useRef([
+        { x: 20, y: 20, scaleX: 1, scaleY: 1, rotation: 0 },
+    ]);
+    const historyStep = useRef(0);
+
+    const [image] = useImage(src);
+
+    const imageRef = useRef();
+    const transformerRef = useRef();
+
+    // const handleUndo = () => {
+    //     if (historyStep.current === 0) {
+    //         return;
+    //     }
+    //     historyStep.current -= 1;
+    //     const previous = history.current[historyStep.current];
+    //     setPosition(previous);
+    // };
+
+    // const handleRedo = () => {
+    //     if (historyStep.current === history.current.length - 1) {
+    //         return;
+    //     }
+    //     historyStep.current += 1;
+    //     const next = history.current[historyStep.current];
+    //     setPosition(next);
+    // };
 
   useEffect(() => {
     // Attach transformer when selected

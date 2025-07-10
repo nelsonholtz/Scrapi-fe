@@ -7,8 +7,10 @@ import { saveBoard, getUserBoard } from "../services/boardSaving";
 import Toolbar from "../components/Toolbar";
 import DraggableImage from "../components/DraggableImage";
 import EditableText from "../components/EditableText";
-import LogOut from "../components/LoginComponents/LogOut";
+//import LogOut from "../components/LoginComponents/LogOut";
 import ToolbarPlaceholder from "../components/placeholderForCSS";
+import DatePicker from "../components/DatePicker";
+
 import "../components/toolBar.css";
 
 const CreateBoard = () => {
@@ -50,9 +52,23 @@ const CreateBoard = () => {
             y: 200,
             text: elementData?.text || "text",
         };
-        const newElements = [...elements, newElement];
+        setElements((prev) => [...prev, newElement]);
         pushToHistory(elements);
-        setElements(newElements);
+    }, [elements, pushToHistory]);
+
+    const handleAddImageElement = useCallback((imageUrl) => {
+        const newImageElement = {
+            id: uuidv4(),
+            type: "image",
+            src: imageUrl,
+            x: 200,
+            y: 200,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: 0,
+        };
+        setElements((prev) => [...prev, newImageElement]);
+        pushToHistory(elements);
     }, [elements, pushToHistory]);
 
     const handleTextChange = (id, newText) => {
@@ -125,19 +141,13 @@ const CreateBoard = () => {
 
     return (
         <div className="create-board-page">
-            <LogOut />
             <button onClick={handleSaveBoard}>Save 💾</button>
-            <label htmlFor="boardDate">Select Date:</label>
-            <input
-                type="date"
-                id="boardDate"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-            />
-            <ToolbarPlaceholder />
+            <DatePicker date={date} onDateChange={setDate} />
+
             <Toolbar
                 onAddText={() => handleAddElement("text", { text: "New Text" })}
                 onAddImage={() => handleAddElement("image")}
+                onUploadingComplete={handleAddImageElement}
                 onUndo={handleUndo}
                 onRedo={handleRedo}
                 onDelete={handleDelete}
@@ -177,6 +187,7 @@ const CreateBoard = () => {
                                 <DraggableImage
                                     key={element.id}
                                     id={element.id}
+                                    src={element.src}
                                     x={element.x}
                                     y={element.y}
                                     scaleX={element.scaleX}

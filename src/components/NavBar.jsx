@@ -1,0 +1,24 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import "../styles/NavBar.css";
+import scrapiLogo from "../assets/paperclip-a.svg";
+import LogOut from "./LoginComponents/LogOut";
+
+const Navbar = () => {
+    return (
+        <nav className="navbar">
+            <h1 className="logo">
+                Scr
+                <img src={scrapiLogo} alt="a" className="logo-icon" />
+                pi
+            </h1>
+            <div className="nav-links">
+                <Link to="/">Home</Link>
+                <Link to="/create">Create Board</Link>
+                <Link to="/profile">Profile</Link>
+            </div>
+        </nav>
+    );
+};
+
+export default Navbar;
