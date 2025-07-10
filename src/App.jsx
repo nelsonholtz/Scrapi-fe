@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import CreateBoard from "./pages/CreateBoard";
 import Calendar from "react-calendar";
 import ProfilePage from "./pages/ProfilePage";
+import ExplorePage from "./pages/ExplorePage";
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/create" element={<CreateBoard />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/explore" element={<ExplorePage />} />
             </Routes>
         </Router>
     );

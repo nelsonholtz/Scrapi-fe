@@ -15,7 +15,8 @@ import DatePicker from "../components/DatePicker";
 import "../components/toolBar.css";
 const CreateBoard = () => {
     const [elements, setElements] = useState([]);
-    const [date, setDate] = useState("2025-07-08");
+    const [date, setDate] = useState("2025-07-11");
+    const [isPublic, setIsPublic] = useState(false);
 
     const stageRef = useRef();
     const { user } = useUser();
@@ -79,6 +80,7 @@ const CreateBoard = () => {
                 elements,
                 user,
                 date,
+                public: isPublic,
             });
 
             alert("Board saved!");
@@ -90,6 +92,14 @@ const CreateBoard = () => {
     return (
         <div className="create-board-page">
             <button onClick={handleSaveBoard}>Save 💾</button>
+            <label>
+                Make public?
+                <input
+                    type="checkbox"
+                    checked={isPublic}
+                    onChange={(e) => setIsPublic(e.target.checked)}
+                />
+            </label>
             <DatePicker date={date} onDateChange={setDate} />
 
             <Toolbar
