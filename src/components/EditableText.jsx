@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Html } from "react-konva-utils";
 import TextComponent from "./TextComponent";
 
-const EditableText = ({ id, text, x, y, onChange, onUpdate, stageRef }) => {
+const EditableText = ({ id, text, x, y, onChange, onUpdate, stageRef, isSelected, onSelect }) => {
     const textNodeRef = useRef();
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(text);
@@ -12,7 +12,7 @@ const EditableText = ({ id, text, x, y, onChange, onUpdate, stageRef }) => {
   };
 
   const handleSubmit = () => {
-    onChange(id, value);
+    onChange({id, text: value});
     setIsEditing(false);
   };
 
@@ -40,6 +40,8 @@ const EditableText = ({ id, text, x, y, onChange, onUpdate, stageRef }) => {
                 onDoubleClick={handleDoubleClick}
                 textRef={textNodeRef}
                 onUpdate={onUpdate}
+                onClick={onSelect}
+                stroke={isSelected ? "blue" : undefined}
             />
 
       {isEditing && (

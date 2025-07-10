@@ -4,16 +4,20 @@ import { v4 as uuidv4 } from "uuid";
 import { useUser } from "../contexts/UserContext";
 import { saveBoard, getUserBoard } from "../services/boardSaving";
 
-//component imports
 import Toolbar from "../components/Toolbar";
 import DraggableImage from "../components/DraggableImage";
 import EditableText from "../components/EditableText";
 import LogOut from "../components/LoginComponents/LogOut";
 import ToolbarPlaceholder from "../components/placeholderForCSS";
 import "../components/toolBar.css";
+
 const CreateBoard = () => {
     const [elements, setElements] = useState([]);
     const [date, setDate] = useState("2025-07-08");
+    const [selectedId, setSelectedId] = useState(null);
+
+    const [history, setHistory] = useState([]);
+    const [redoStack, setRedoStack] = useState([]);
 
     const stageRef = useRef();
     const { user } = useUser();
@@ -30,6 +34,11 @@ const CreateBoard = () => {
         }
     }, [user, date]);
 
+    const pushToHistory = useCallback((newElements) => {
+        setHistory((prev) => [...prev, newElements]);
+        setRedoStack([]); // Clear redo stack on new action
+    }, []);
+
     const handleAddElement = useCallback((elementType, elementData) => {
         const newElement = {
             id: uuidv4(),
@@ -37,22 +46,59 @@ const CreateBoard = () => {
             ...elementData,
             x: 200,
             y: 200,
+            text: elementData?.text || "text",
         };
-        setElements((prev) => [...prev, newElement]);
-    }, []);
+        const newElements = [...elements, newElement];
+        pushToHistory(elements);
+        setElements(newElements);
+    }, [elements, pushToHistory]);
 
     const handleTextChange = (id, newText) => {
-        setElements((prev) =>
-            prev.map((element) =>
-                element.id === id ? { ...element, text: newText } : element
-            )
-        );
-    };
+        setElements((prev) => {
+          const newElements = prev.map((element) =>
+            element.id === id ? { ...element, text: newText } : element
+          );
+          pushToHistory(newElements); // 👈 Track typing in history
+          console.log(newElements);
+          return newElements;
+        });
+      };
+      
 
     const handleUpdateElement = (id, updates) => {
-        setElements((prev) =>
-            prev.map((el) => (el.id === id ? { ...el, ...updates } : el))
-        );
+        setElements((prev) => {
+            const newElements = prev.map((el) =>
+                el.id === id ? { ...el, ...updates } : el
+            );
+            pushToHistory(prev);
+            return newElements;
+        });
+    };
+
+    const handleDelete = () => {
+        if (!selectedId) return;
+        const newElements = elements.filter(el => el.id !== selectedId);
+        pushToHistory(elements);
+        setElements(newElements);
+        setSelectedId(null);
+    };
+
+    const handleUndo = () => {
+        if (history.length === 0) return;
+        const previous = history[history.length - 1];
+        setRedoStack((prev) => [...prev, elements]);
+        setHistory((prev) => prev.slice(0, -1));
+        setElements(previous);
+        setSelectedId(null);
+    };
+
+    const handleRedo = () => {
+        if (redoStack.length === 0) return;
+        const next = redoStack[redoStack.length - 1];
+        setRedoStack((prev) => prev.slice(0, -1));
+        setHistory((prev) => [...prev, elements]);
+        setElements(next);
+        setSelectedId(null);
     };
 
     const handleSaveBoard = async () => {
@@ -64,17 +110,16 @@ const CreateBoard = () => {
                 user,
                 date,
             });
-
             alert("Board saved!");
         } catch (err) {
             console.error("Error saving board", err);
             alert("Failed to save board");
         }
     };
+
     return (
         <div className="create-board-page">
             <LogOut />
-
             <button onClick={handleSaveBoard}>Save 💾</button>
             <label htmlFor="boardDate">Select Date:</label>
             <input
@@ -87,15 +132,24 @@ const CreateBoard = () => {
             <Toolbar
                 onAddText={() => handleAddElement("text", { text: "New Text" })}
                 onAddImage={() => handleAddElement("image")}
+                onUndo={handleUndo}
+                onRedo={handleRedo}
+                onDelete={handleDelete}
+                selectedId={selectedId}
             />
 
             <Stage
                 ref={stageRef}
                 width={window.innerWidth}
                 height={window.innerHeight}
+                onMouseDown={(e) => {
+                    const clickedOnEmpty = e.target === e.target.getStage();
+                    if (clickedOnEmpty) setSelectedId(null);
+                }}
             >
                 <Layer>
                     {elements.map((element) => {
+                        const isSelected = element.id === selectedId;
                         if (element.type === "text") {
                             return (
                                 <EditableText
@@ -106,6 +160,8 @@ const CreateBoard = () => {
                                     y={element.y}
                                     onChange={handleTextChange}
                                     onUpdate={handleUpdateElement}
+                                    isSelected={isSelected}
+                                    onSelect={() => setSelectedId(element.id)}
                                     stageRef={stageRef}
                                 />
                             );
@@ -120,6 +176,8 @@ const CreateBoard = () => {
                                     scaleX={element.scaleX}
                                     scaleY={element.scaleY}
                                     rotation={element.rotation}
+                                    isSelected={isSelected}
+                                    onSelect={() => setSelectedId(element.id)}
                                     onUpdate={handleUpdateElement}
                                 />
                             );
