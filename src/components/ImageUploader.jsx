@@ -1,5 +1,7 @@
 import { useRef } from "react";
 import { useUser } from "../contexts/UserContext";
+import { RiImageAddFill } from "react-icons/ri";
+import "../styles/toolbar-update.css";
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
@@ -48,7 +50,9 @@ const ImageUploader = ({ onUploadingComplete }) => {
 
     return (
         <>
-            <button onClick={handleClick}>Upload Image</button>
+            <button onClick={handleClick} className="toolbar-button">
+                <RiImageAddFill />
+            </button>
             <input
                 type="file"
                 accept="image/*"
