@@ -1,13 +1,24 @@
 @import url("https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap");
 
-.script-text {
-  font-family: "Dancing Script", cursive;
-}
 :root {
   --oxford-blue: #14213d;
   --orange-web: #fca311;
   --platinum: #e5e5e5;
+  --error-red: #ff4d4f;
+  --success-green: #38b000;
 }
+
+body {
+  margin: 0;
+  font-family: "Helvetica Neue", sans-serif;
+  background-color: #f8f9fa;
+}
+
+.script-text {
+  font-family: "Dancing Script", cursive;
+}
+
+/* Form Container */
 .auth {
   max-width: 400px;
   margin: 80px auto;
@@ -16,14 +27,17 @@
   border-radius: 10px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
   color: var(--platinum);
-  font-family: "Helvetica Neue", sans-serif;
 }
+
+/* Heading */
 .auth h1 {
   text-align: center;
   margin-bottom: 25px;
   color: var(--orange-web);
   font-size: 1.8rem;
 }
+
+/* Labels */
 .auth label {
   display: block;
   margin-bottom: 8px;
@@ -31,17 +45,63 @@
   font-size: 0.95rem;
   color: var(--platinum);
 }
+
+/* Inputs */
 .auth input {
   width: 100%;
   padding: 10px 12px;
+  min-height: 36px;
   border: 1px solid var(--orange-web);
   border-radius: 6px;
   margin-bottom: 20px;
   font-size: 1rem;
   background-color: transparent;
   color: var(--platinum);
+  transition: border-color 0.2s ease;
 }
+
+.auth input:focus {
+  border-color: #fff;
+  outline: none;
+}
+
+/* Placeholder style */
 .auth input::placeholder {
+  color: #ccc;
+}
+
+input.error {
+  border: 2px solid red;
+}
+
+input.success {
+  border: 2px solid green;
+}
+
+.error-text {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 4px;
+}
+
+.error-text {
+  color: var(--error-red);
+  font-size: 0.9rem;
+  margin-top: -16px;
+  margin-bottom: 16px;
+}
+
+.helper-text {
+  color: #bbb;
+  font-size: 0.85rem;
+  margin-top: -12px;
+  margin-bottom: 16px;
+}
+
+.auth label.optional::after {
+  content: " (optional)";
+  font-weight: normal;
+  font-style: italic;
   color: #ccc;
 }
 
@@ -57,9 +117,12 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
+
 .auth button:hover {
   background-color: #ffb703;
 }
+
+/* Logout Button */
 .logout-button {
   background-color: var(--orange-web);
   color: var(--oxford-blue);

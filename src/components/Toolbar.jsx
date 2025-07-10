@@ -9,7 +9,7 @@ const Toolbar = ({
     onAddText,
     onAddImage,
     onUndo,
-    onRedo,
+    onRedo, onDelete, selectedId,
     onUploadingComplete,
 }) => {
     return (
@@ -23,7 +23,17 @@ const Toolbar = ({
                 <li>
                     <ImageUploader onUploadingComplete={onUploadingComplete} />
                 </li>
+                <li>
+                <button 
+                onClick={onDelete} 
+                disabled={!selectedId}
+                style={{ backgroundColor: selectedId ? "#f00" : "#ccc", color: "#fff" }}
+            >
+                Delete Selected
+            </button>
+                </li>
             </ul>
+
 
             <div className="side-toolbar-container">
                 <button className="toolbar-button" onClick={onUndo}>
