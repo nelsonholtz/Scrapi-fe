@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 
 const TextComponent = forwardRef(
     (
-        { text = "New Text", onDoubleClick, x = 100, y = 100, id, onUpdate },
+        { text = "New Text", onDoubleClick, x = 100, y = 100, id, onUpdate, onClick, isSelected },
         ref
     ) => {
         return (
@@ -20,6 +20,8 @@ const TextComponent = forwardRef(
                         y: e.target.y(),
                     });
                 }}
+                onClick={onClick}
+                stroke={isSelected ? "blue" : undefined}
             />
         );
     }

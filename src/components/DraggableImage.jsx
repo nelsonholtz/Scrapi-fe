@@ -1,6 +1,6 @@
-import { Stage, Layer, Image, Transformer, Rect, Text } from "react-konva";
-import useImage from "use-image";
 import { useRef, useEffect, useState } from "react";
+import { Image, Transformer } from "react-konva";
+import useImage from "use-image";
 
 const DraggableImage = ({
     id,
@@ -11,9 +11,11 @@ const DraggableImage = ({
     scaleY = 1,
     rotation = 0,
     onUpdate,
-    selected,
     onSelect,
+    isSelected,
 }) => {
+    const shapeRef = useRef();
+    const trRef = useRef();
     const [position, setPosition] = useState({
         x,
         y,
@@ -33,92 +35,59 @@ const DraggableImage = ({
     const imageRef = useRef();
     const transformerRef = useRef();
 
-    const handleUndo = () => {
-        if (historyStep.current === 0) {
-            return;
-        }
-        historyStep.current -= 1;
-        const previous = history.current[historyStep.current];
-        setPosition(previous);
-    };
+    // const handleUndo = () => {
+    //     if (historyStep.current === 0) {
+    //         return;
+    //     }
+    //     historyStep.current -= 1;
+    //     const previous = history.current[historyStep.current];
+    //     setPosition(previous);
+    // };
 
-    const handleRedo = () => {
-        if (historyStep.current === history.current.length - 1) {
-            return;
-        }
-        historyStep.current += 1;
-        const next = history.current[historyStep.current];
-        setPosition(next);
-    };
+    // const handleRedo = () => {
+    //     if (historyStep.current === history.current.length - 1) {
+    //         return;
+    //     }
+    //     historyStep.current += 1;
+    //     const next = history.current[historyStep.current];
+    //     setPosition(next);
+    // };
 
     useEffect(() => {
-        if (selected && image && imageRef.current && transformerRef.current) {
-            transformerRef.current.nodes([imageRef.current]);
-            transformerRef.current.getLayer().batchDraw();
+        // Attach transformer when selected
+        if (isSelected && trRef.current && shapeRef.current) {
+            trRef.current.nodes([shapeRef.current]);
+            trRef.current.getLayer().batchDraw();
         }
-    }, [image, selected]);
+    }, [isSelected, image]);
 
-    const handleDragEnd = (e) => {
-        history.current = history.current.slice(0, historyStep.current + 1);
-        const pos = {
-            x: e.target.x(),
-            y: e.target.y(),
-            scaleX: e.target.scaleX(),
-            scaleY: e.target.scaleY(),
-            rotation: e.target.rotation(),
-        };
-        // Push the new state
-        history.current = history.current.concat([pos]);
-        historyStep.current += 1;
-        setPosition(pos);
-        onUpdate?.(id, pos);
-    };
-
-    const handleTransformEnd = (e) => {
-        history.current = history.current.slice(0, historyStep.current + 1);
-        const pos = {
-            x: e.target.x(),
-            y: e.target.y(),
-            scaleX: e.target.scaleX(),
-            scaleY: e.target.scaleY(),
-            rotation: e.target.rotation(),
-        };
-        // Push the new state
-        history.current = history.current.concat([pos]);
-        historyStep.current += 1;
-        setPosition(pos);
-        onUpdate?.(id, pos);
+    const handleDragTransformEnd = (e) => {
+        const node = shapeRef.current;
+        onUpdate(id, {
+            x: node.x(),
+            y: node.y(),
+            scaleX: node.scaleX(),
+            scaleY: node.scaleY(),
+            rotation: node.rotation(),
+        });
     };
 
     return (
         <>
-            <Text text="undo" onClick={handleUndo} />
-            <Text text="redo" x={40} onClick={handleRedo} />
             <Image
-                x={position.x}
-                y={position.y}
-                scaleX={position.scaleX}
-                scaleY={position.scaleY}
-                rotation={position.rotation}
-                width={100}
-                height={100}
+                ref={shapeRef}
                 image={image}
+                x={x}
+                y={y}
+                scaleX={scaleX}
+                scaleY={scaleY}
+                rotation={rotation}
                 draggable
                 onClick={onSelect}
-                onDragEnd={handleDragEnd}
-                ref={imageRef}
-                onTransformStart={() => {}}
-                onTransform={() => {}}
-                onTransformEnd={handleTransformEnd}
+                onTransformEnd={handleDragTransformEnd}
+                onDragEnd={handleDragTransformEnd}
             />
-            {selected && (
-                <Transformer
-                    ref={transformerRef}
-                    onTransformStart={() => {}}
-                    onTransform={() => {}}
-                    onTransformEnd={() => {}}
-                />
-            )}
+            {isSelected && <Transformer ref={trRef} />}
         </>
     );
 };
