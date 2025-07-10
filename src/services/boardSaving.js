@@ -7,10 +7,11 @@ import {
     getDoc,
     setDoc,
     serverTimestamp,
+    orderBy,
 } from "firebase/firestore";
 import { db } from "./firebase";
 
-export const saveBoard = async ({ elements, user, date }) => {
+export const saveBoard = async ({ elements, user, date, public: isPublic }) => {
     if (!user) throw new Error("User not logged in");
 
     const docId = `${user.uid}_${date}`;
@@ -21,6 +22,7 @@ export const saveBoard = async ({ elements, user, date }) => {
         userId: user.uid,
         date,
         updatedAt: serverTimestamp(),
+        public: isPublic,
     };
 
     await setDoc(boardRef, boardData);
@@ -55,4 +57,19 @@ export const getUserBoardDates = async (userId) => {
         }
     });
     return dates;
+};
+
+export const getPublicBoards = async () => {
+    const boardsRef = collection(db, "boards");
+    const q = query(
+        boardsRef,
+        where("public", "==", true),
+        orderBy("updatedAt", "desc")
+    );
+    const allPublicBoards = await getDocs(q);
+    const allPublicBoardsArr = allPublicBoards.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+    }));
+    return allPublicBoardsArr;
 };

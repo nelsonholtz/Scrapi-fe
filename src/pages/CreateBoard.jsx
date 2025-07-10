@@ -15,11 +15,12 @@ import "../components/toolBar.css";
 
 const CreateBoard = () => {
     const [elements, setElements] = useState([]);
-    const [date, setDate] = useState("2025-07-08");
+    const [date, setDate] = useState("2025-07-11");
     const [selectedId, setSelectedId] = useState(null);
 
     const [history, setHistory] = useState([]);
     const [redoStack, setRedoStack] = useState([]);
+    const [isPublic, setIsPublic] = useState(false);
 
     const stageRef = useRef();
     const { user } = useUser();
@@ -28,9 +29,11 @@ const CreateBoard = () => {
         if (user && date) {
             getUserBoard(user.uid, date).then((board) => {
                 if (board) {
-                    setElements(board.elements);
+                    setElements(board.elements || []);
+                    setIsPublic(!!board.public);
                 } else {
                     setElements([]);
+                    setIsPublic(false);
                 }
             });
         }
@@ -41,50 +44,54 @@ const CreateBoard = () => {
         setRedoStack([]); // Clear redo stack on new action
     }, []);
 
-        
+    const handleAddElement = useCallback(
+        (elementType, elementData) => {
+            const newElement = {
+                id: uuidv4(),
+                type: elementType,
+                ...elementData,
+                x: 200,
+                y: 200,
+                text: elementData?.text || "text",
+            };
+            setElements((prev) => [...prev, newElement]);
+            pushToHistory(elements);
+        },
+        [elements, pushToHistory]
+    );
 
-    const handleAddElement = useCallback((elementType, elementData) => {
-        const newElement = {
-            id: uuidv4(),
-            type: elementType,
-            ...elementData,
-            x: 200,
-            y: 200,
-            text: elementData?.text || "text",
-        };
-        setElements((prev) => [...prev, newElement]);
-        pushToHistory(elements);
-    }, [elements, pushToHistory]);
-
-    const handleAddImageElement = useCallback((imageUrl) => {
-        const newImageElement = {
-            id: uuidv4(),
-            type: "image",
-            src: imageUrl,
-            x: 200,
-            y: 200,
-            scaleX: 1,
-            scaleY: 1,
-            rotation: 0,
-        };
-        setElements((prev) => [...prev, newImageElement]);
-        pushToHistory(elements);
-    }, [elements, pushToHistory]);
+    const handleAddImageElement = useCallback(
+        (imageUrl) => {
+            const newImageElement = {
+                id: uuidv4(),
+                type: "image",
+                src: imageUrl,
+                x: 200,
+                y: 200,
+                scaleX: 1,
+                scaleY: 1,
+                rotation: 0,
+            };
+            setElements((prev) => [...prev, newImageElement]);
+            pushToHistory(elements);
+        },
+        [elements, pushToHistory]
+    );
 
     const handleTextChange = (id, newText) => {
         setElements((prev) => {
-          const newElements = prev.map((el) =>
-            el.id === id ? { ...el, text: newText } : el
-          );
-      
-          //Deep clone before saving to history so it captures the actual text
-          const cloned = JSON.parse(JSON.stringify(newElements));
-          setRedoStack([]); // Clear redo on typing
-          setHistory((prevHistory) => [...prevHistory, cloned]);
-      
-          return newElements;
+            const newElements = prev.map((el) =>
+                el.id === id ? { ...el, text: newText } : el
+            );
+
+            //Deep clone before saving to history so it captures the actual text
+            const cloned = JSON.parse(JSON.stringify(newElements));
+            setRedoStack([]); // Clear redo on typing
+            setHistory((prevHistory) => [...prevHistory, cloned]);
+
+            return newElements;
         });
-      };
+    };
 
     const handleUpdateElement = (id, updates) => {
         setElements((prev) => {
@@ -98,13 +105,12 @@ const CreateBoard = () => {
 
     const handleDelete = () => {
         if (!selectedId) return;
-        const newElements = elements.filter(el => el.id !== selectedId);
+        const newElements = elements.filter((el) => el.id !== selectedId);
         pushToHistory(elements);
         setElements(newElements);
         setSelectedId(null);
     };
 
-            
     const handleUndo = () => {
         if (history.length === 0) return;
         const previous = history[history.length - 1];
@@ -131,6 +137,7 @@ const CreateBoard = () => {
                 elements,
                 user,
                 date,
+                public: isPublic,
             });
             alert("Board saved!");
         } catch (err) {
@@ -142,6 +149,14 @@ const CreateBoard = () => {
     return (
         <div className="create-board-page">
             <button onClick={handleSaveBoard}>Save 💾</button>
+            <label>
+                Make public?
+                <input
+                    type="checkbox"
+                    checked={isPublic}
+                    onChange={(e) => setIsPublic(e.target.checked)}
+                />
+            </label>
             <DatePicker date={date} onDateChange={setDate} />
 
             <Toolbar
