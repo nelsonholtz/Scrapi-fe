@@ -2,13 +2,37 @@ import "../styles/toolbar-update.css";
 import { MdDeleteForever } from "react-icons/md";
 import { BiLayerPlus } from "react-icons/bi";
 import { BiLayerMinus } from "react-icons/bi";
+import { FaFont } from "react-icons/fa";
 
-const FloatingToolbar = ({ onMoveUp, onMoveDown, onDelete }) => {
+const fonts = ["Arial", "Courier New", "Georgia", "Times New Roman", "Verdana"];
+
+const FloatingToolbar = ({
+    isTextSelected,
+    onMoveUp,
+    onMoveDown,
+    onDelete,
+    selectedFont,
+    onFontChange,
+}) => {
     return (
         <div className="floating-toolbar ">
             <ul>
+                {isTextSelected && (
+                    <li>
+                        <select
+                            value={selectedFont}
+                            onChange={(e) => onFontChange(e.target.value)}
+                        >
+                            {fonts.map((font) => (
+                                <option key={font} value={font}>
+                                    {font}
+                                </option>
+                            ))}
+                        </select>
+                    </li>
+                )}
                 <li>
-                    <button className="toolbar-button" onClick={onMoveUp}>
+                    <button onClick={onMoveUp}>
                         <BiLayerPlus />
                     </button>
                 </li>

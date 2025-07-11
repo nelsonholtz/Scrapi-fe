@@ -10,6 +10,7 @@ const TextComponent = forwardRef(
             y = 100,
             rotation,
             id,
+            fontFamily,
             onUpdate,
             onClick,
             isSelected,
@@ -23,6 +24,7 @@ const TextComponent = forwardRef(
                 x={x}
                 y={y}
                 rotation={rotation}
+                fontFamily={fontFamily}
                 draggable
                 onDblClick={() => onDoubleClick?.({ id, x, y, text })}
                 onDragEnd={(e) => {

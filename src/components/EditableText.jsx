@@ -8,6 +8,7 @@ const EditableText = ({
     y,
     text,
     fontSize,
+    fontFamily,
     rotation,
     onChange,
     onUpdate,
@@ -107,6 +108,7 @@ const EditableText = ({
                     ref={textRef}
                     text={text} //Shows correct text from props
                     fontSize={localFontSize}
+                    fontFamily={fontFamily}
                     draggable
                     onClick={handleSelect}
                     onDblClick={handleDblClick}

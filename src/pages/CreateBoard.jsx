@@ -19,6 +19,7 @@ const CreateBoard = () => {
     const [elements, setElements] = useState([]);
     const [date, setDate] = useState("2025-07-11");
     const [selectedId, setSelectedId] = useState(null);
+    const [selectedFont, setSelectedFont] = useState("Arial");
 
     const [history, setHistory] = useState([]);
     const [redoStack, setRedoStack] = useState([]);
@@ -27,6 +28,9 @@ const CreateBoard = () => {
 
     const stageRef = useRef();
     const { user } = useUser();
+
+    const selectedElement = elements.find((el) => el.id === selectedId);
+    const isTextSelected = selectedElement?.type === "text";
 
     useEffect(() => {
         if (user && date) {
@@ -225,6 +229,7 @@ const CreateBoard = () => {
                                     text={element.text}
                                     x={element.x}
                                     y={element.y}
+                                    fontFamily={element.fontFamily}
                                     fontSize={element.fontSize || 20}
                                     rotation={element.rotation}
                                     onChange={handleTextChange}
@@ -261,6 +266,19 @@ const CreateBoard = () => {
                     onMoveUp={() => moveLayer("up")}
                     onMoveDown={() => moveLayer("down")}
                     onDelete={handleDelete}
+                    isTextSelected={isTextSelected}
+                    selectedFont={
+                        isTextSelected
+                            ? selectedElement?.fontFamily || "Arial"
+                            : undefined
+                    }
+                    onFontChange={(newFont) => {
+                        if (isTextSelected && selectedId) {
+                            handleUpdateElement(selectedId, {
+                                fontFamily: newFont,
+                            });
+                        }
+                    }}
                 />
             )}
         </div>
