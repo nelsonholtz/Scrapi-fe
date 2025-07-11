@@ -14,11 +14,13 @@ import FloatingToolbar from "../components/FloatingToolbar";
 
 import StickerLibrary from "../components/StickerLibrary";
 import "../components/toolBar.css";
+import "../styles/errorMessage.css";
 
 const CreateBoard = () => {
     const [elements, setElements] = useState([]);
     const [date, setDate] = useState("2025-07-11");
     const [selectedId, setSelectedId] = useState(null);
+    const [error, setError] = useState(null);
     const [selectedFont, setSelectedFont] = useState("Arial");
 
     const [history, setHistory] = useState([]);
@@ -34,15 +36,20 @@ const CreateBoard = () => {
 
     useEffect(() => {
         if (user && date) {
-            getUserBoard(user.uid, date).then((board) => {
-                if (board) {
-                    setElements(board.elements || []);
-                    setIsPublic(!!board.public);
-                } else {
-                    setElements([]);
-                    setIsPublic(false);
-                }
-            });
+            getUserBoard(user.uid, date)
+                .then((board) => {
+                    if (board) {
+                        setElements(board.elements || []);
+                        setIsPublic(!!board.public);
+                    } else {
+                        setElements([]);
+                        setIsPublic(false);
+                    }
+                })
+                .catch((err) => {
+                    setError(err);
+                    console.error("Failed to load board", err);
+                });
         }
     }, [user, date]);
 
@@ -73,21 +80,27 @@ const CreateBoard = () => {
 
     const handleAddImageElement = useCallback(
         (imageUrl) => {
-            const newImageElement = {
-                id: uuidv4(),
-                type: "image",
-                src: imageUrl,
-                x: 200,
-                y: 200,
-                scaleX: 1,
-                scaleY: 1,
-                rotation: 0,
-            };
-            setElements((prev) => {
-                const newElements = [...prev, newImageElement];
-                pushToHistory(newElements);
-                return newElements;
-            });
+            try {
+                const newImageElement = {
+                    id: uuidv4(),
+                    type: "image",
+                    src: imageUrl,
+                    x: 200,
+                    y: 200,
+                    scaleX: 1,
+                    scaleY: 1,
+                    rotation: 0,
+                };
+                setElements((prev) => {
+                    const newElements = [...prev, newImageElement];
+                    pushToHistory(newElements);
+                    return newElements;
+                });
+                // setError(null);
+            } catch (err) {
+                setError("This image is hiding, please try again");
+                console.error("This image has been lost in the scrapbook", err);
+            }
         },
         [pushToHistory]
     );
@@ -165,8 +178,14 @@ const CreateBoard = () => {
     };
 
     const handleSaveBoard = async () => {
-        if (!user) return console.log("You must be logged in to save!");
-
+        if (!user) {
+            return console.log("You must be logged in to save!");
+        }
+        if (elements.length === 0) {
+            setError(
+                "Why dont you add something to your wonderful board before saving 😏"
+            );
+        }
         try {
             await saveBoard({
                 elements,
@@ -174,15 +193,28 @@ const CreateBoard = () => {
                 date,
                 public: isPublic,
             });
-            alert("Board saved!");
+            //   setError(null);
+            //   alert("Board saved!");
         } catch (err) {
+            //   alert("Failed to save board");
             console.error("Error saving board", err);
-            alert("Failed to save board");
         }
     };
 
     return (
         <div className="create-board-page">
+            {error && (
+                <div className="error-message">
+                    {error}
+                    <button
+                        onClick={() => setError(null)}
+                        className="close-btn"
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
+
             <button onClick={handleSaveBoard}>Save 💾</button>
             <label>
                 Make public?
@@ -200,6 +232,7 @@ const CreateBoard = () => {
                 onUploadingComplete={handleAddImageElement}
                 onUndo={handleUndo}
                 onRedo={handleRedo}
+                onUploadError={(msg) => setError(msg)}
                 onDelete={handleDelete}
                 selectedId={selectedId}
                 onOpenStickerLibrary={() => setShowStickerLibrary(true)}

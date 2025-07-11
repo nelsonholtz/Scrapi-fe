@@ -8,8 +8,11 @@ import ImageUploader from "./ImageUploader";
 
 const Toolbar = ({
     onAddText,
+    onAddImage,
     onUndo,
     onRedo,
+    onDelete,
+    selectedId,
     onOpenStickerLibrary,
     onUploadingComplete,
 }) => {

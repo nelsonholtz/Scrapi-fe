@@ -10,13 +10,28 @@ const ImageUploader = ({ onUploadingComplete }) => {
     const { user } = useUser();
     const fileRef = useRef();
 
+    const ValidImage = (filename) => {
+        const endingLetters = filename.toLowerCase();
+        return (
+            endingLetters.endsWith(".jpeg") || endingLetters.endsWith(".png")
+        );
+    };
+
     const handleClick = () => {
         fileRef.current.click();
     };
 
     const handleFileChange = async (e) => {
         const file = e.target.files[0];
+        const filename =
+            typeof imageUrl === "string" ? imageUrl : imageUrl.name;
         if (!file) return;
+
+        if (!ValidImage(filename)) {
+            setError("Scrapi only accepts jpeg and png files 🐧");
+            return;
+        }
+
         if (!user) {
             console.log("please login");
             return;
