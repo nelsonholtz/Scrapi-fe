@@ -8,11 +8,8 @@ import ImageUploader from "./ImageUploader";
 
 const Toolbar = ({
     onAddText,
-    onAddImage,
     onUndo,
     onRedo,
-    onDelete,
-    selectedId,
     onOpenStickerLibrary,
     onUploadingComplete,
 }) => {
@@ -27,18 +24,7 @@ const Toolbar = ({
                 <li>
                     <ImageUploader onUploadingComplete={onUploadingComplete} />
                 </li>
-                <li>
-                    <button
-                        onClick={onDelete}
-                        disabled={!selectedId}
-                        style={{
-                            backgroundColor: selectedId ? "#f00" : "#ccc",
-                            color: "#fff",
-                        }}
-                    >
-                        Delete Selected
-                    </button>
-                </li>
+
                 <li>
                     <button
                         className="toolbar-button"

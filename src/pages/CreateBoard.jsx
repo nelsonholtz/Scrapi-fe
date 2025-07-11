@@ -10,6 +10,7 @@ import EditableText from "../components/EditableText";
 //import LogOut from "../components/LoginComponents/LogOut";
 import ToolbarPlaceholder from "../components/placeholderForCSS";
 import DatePicker from "../components/DatePicker";
+import FloatingToolbar from "../components/FloatingToolbar";
 
 import StickerLibrary from "../components/StickerLibrary";
 import "../components/toolBar.css";
@@ -55,11 +56,15 @@ const CreateBoard = () => {
                 x: 200,
                 y: 200,
                 text: elementData?.text || "text",
+                fontSize: 20,
             };
-            setElements((prev) => [...prev, newElement]);
-            pushToHistory(elements);
+            setElements((prev) => {
+                const newElements = [...prev, newElement];
+                pushToHistory(newElements); // push the updated array, not old 'elements'
+                return newElements;
+            });
         },
-        [elements, pushToHistory]
+        [pushToHistory]
     );
 
     const handleAddImageElement = useCallback(
@@ -74,10 +79,13 @@ const CreateBoard = () => {
                 scaleY: 1,
                 rotation: 0,
             };
-            setElements((prev) => [...prev, newImageElement]);
-            pushToHistory(elements);
+            setElements((prev) => {
+                const newElements = [...prev, newImageElement];
+                pushToHistory(newElements);
+                return newElements;
+            });
         },
-        [elements, pushToHistory]
+        [pushToHistory]
     );
 
     const handleTextChange = (id, newText) => {
@@ -100,16 +108,18 @@ const CreateBoard = () => {
             const newElements = prev.map((el) =>
                 el.id === id ? { ...el, ...updates } : el
             );
-            pushToHistory(prev);
+            pushToHistory(newElements);
             return newElements;
         });
     };
 
     const handleDelete = () => {
         if (!selectedId) return;
-        const newElements = elements.filter((el) => el.id !== selectedId);
-        pushToHistory(elements);
-        setElements(newElements);
+        setElements((prev) => {
+            const newElements = prev.filter((el) => el.id !== selectedId);
+            pushToHistory(newElements);
+            return newElements;
+        });
         setSelectedId(null);
     };
 
@@ -129,6 +139,25 @@ const CreateBoard = () => {
         setHistory((prev) => [...prev, elements]);
         setElements(next);
         setSelectedId(null);
+    };
+
+    const moveLayer = (direction) => {
+        setElements((prev) => {
+            const index = prev.findIndex(
+                (element) => element.id === selectedId
+            );
+            if (index < 0) return prev;
+
+            const newIndex = direction === "up" ? index + 1 : index - 1;
+            if (newIndex < 0 || newIndex >= prev.length) return prev;
+
+            const newElements = [...prev];
+            const [movedElement] = newElements.splice(index, 1);
+            newElements.splice(newIndex, 0, movedElement);
+
+            pushToHistory(newElements);
+            return newElements;
+        });
     };
 
     const handleSaveBoard = async () => {
@@ -196,6 +225,8 @@ const CreateBoard = () => {
                                     text={element.text}
                                     x={element.x}
                                     y={element.y}
+                                    fontSize={element.fontSize || 20}
+                                    rotation={element.rotation}
                                     onChange={handleTextChange}
                                     onUpdate={handleUpdateElement}
                                     isSelected={isSelected}
@@ -225,6 +256,13 @@ const CreateBoard = () => {
                     })}
                 </Layer>
             </Stage>
+            {selectedId && (
+                <FloatingToolbar
+                    onMoveUp={() => moveLayer("up")}
+                    onMoveDown={() => moveLayer("down")}
+                    onDelete={handleDelete}
+                />
+            )}
         </div>
     );
 };

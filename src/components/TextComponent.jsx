@@ -3,7 +3,17 @@ import { forwardRef } from "react";
 
 const TextComponent = forwardRef(
     (
-        { text = "New Text", onDoubleClick, x = 100, y = 100, id, onUpdate, onClick, isSelected },
+        {
+            text = "New Text",
+            onDoubleClick,
+            x = 100,
+            y = 100,
+            rotation,
+            id,
+            onUpdate,
+            onClick,
+            isSelected,
+        },
         ref
     ) => {
         return (
@@ -12,6 +22,7 @@ const TextComponent = forwardRef(
                 text={text}
                 x={x}
                 y={y}
+                rotation={rotation}
                 draggable
                 onDblClick={() => onDoubleClick?.({ id, x, y, text })}
                 onDragEnd={(e) => {
