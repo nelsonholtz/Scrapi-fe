@@ -7,58 +7,58 @@ import { RiEmojiStickerLine } from "react-icons/ri";
 import ImageUploader from "./ImageUploader";
 
 const Toolbar = ({
-    onAddText,
-    onAddImage,
-    onUndo,
-    onRedo,
-    onDelete,
-    selectedId,
-    onOpenStickerLibrary,
-    onUploadingComplete,
+  onAddText,
+  onAddImage,
+  onUndo,
+  onRedo,
+  onDelete,
+  selectedId,
+  onOpenStickerLibrary,
+  onUploadingComplete,
 }) => {
-    return (
-        <div className="toolbar-container">
-            <ul className="toolbar-list">
-                <li>
-                    <button className="toolbar-button" onClick={onAddText}>
-                        <BsTextareaT />
-                    </button>
-                </li>
-                <li>
-                    <ImageUploader onUploadingComplete={onUploadingComplete} />
-                </li>
-                <li>
-                    <button
-                        onClick={onDelete}
-                        disabled={!selectedId}
-                        style={{
-                            backgroundColor: selectedId ? "#f00" : "#ccc",
-                            color: "#fff",
-                        }}
-                    >
-                        Delete Selected
-                    </button>
-                </li>
-                <li>
-                    <button
-                        className="toolbar-button"
-                        onClick={onOpenStickerLibrary}
-                    >
-                        <RiEmojiStickerLine />
-                    </button>
-                </li>
-            </ul>
+  return (
+    <div className="toolbar-container">
+      <ul className="toolbar-list">
+        <li>
+          <button className="toolbar-button" onClick={onAddText}>
+            <BsTextareaT />
+          </button>
+        </li>
+        <li>
+          <ImageUploader
+            onUploadingComplete={onUploadingComplete}
+            onError={onUploadError}
+          />
+        </li>
+        <li>
+          <button
+            onClick={onDelete}
+            disabled={!selectedId}
+            style={{
+              backgroundColor: selectedId ? "#f00" : "#ccc",
+              color: "#fff",
+            }}
+          >
+            Delete Selected
+          </button>
+        </li>
+        <li>
+          <button className="toolbar-button" onClick={onOpenStickerLibrary}>
+            <RiEmojiStickerLine />
+          </button>
+        </li>
+      </ul>
 
-            <div className="side-toolbar-container">
-                <button className="toolbar-button" onClick={onUndo}>
-                    <FaUndo />
-                </button>
-                <button className="toolbar-button" onClick={onRedo}>
-                    <FaRedo />
-                </button>
-            </div>
-        </div>
-    );
+      <div className="side-toolbar-container">
+        <button className="toolbar-button" onClick={onUndo}>
+          <FaUndo />
+        </button>
+        <button className="toolbar-button" onClick={onRedo}>
+          <FaRedo />
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default Toolbar;
