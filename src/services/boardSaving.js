@@ -11,7 +11,13 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase";
 
-export const saveBoard = async ({ elements, user, date, public: isPublic }) => {
+export const saveBoard = async ({
+    elements,
+    user,
+    date,
+    public: isPublic,
+    previewImage,
+}) => {
     if (!user) throw new Error("User not logged in");
 
     const docId = `${user.uid}_${date}`;
@@ -23,6 +29,7 @@ export const saveBoard = async ({ elements, user, date, public: isPublic }) => {
         date,
         updatedAt: serverTimestamp(),
         public: isPublic,
+        preview_image: previewImage,
     };
 
     await setDoc(boardRef, boardData);

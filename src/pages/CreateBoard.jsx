@@ -187,11 +187,13 @@ const CreateBoard = () => {
             );
         }
         try {
+            const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
             await saveBoard({
                 elements,
                 user,
                 date,
                 public: isPublic,
+                previewImage: dataURL,
             });
             //   setError(null);
             //   alert("Board saved!");
@@ -199,6 +201,16 @@ const CreateBoard = () => {
             //   alert("Failed to save board");
             console.error("Error saving board", err);
         }
+    };
+
+    const exportToImage = () => {
+        const uri = stageRef.current.toDataURL({ pixelRatio: 2 });
+        const link = document.createElement("a");
+        link.download = "my-scrapi-board.png";
+        link.href = uri;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     return (
@@ -216,6 +228,8 @@ const CreateBoard = () => {
             )}
 
             <button onClick={handleSaveBoard}>Save 💾</button>
+            <button onClick={exportToImage}>Export 📤</button>
+
             <label>
                 Make public?
                 <input
