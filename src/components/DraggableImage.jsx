@@ -30,7 +30,7 @@ const DraggableImage = ({
     ]);
     const historyStep = useRef(0);
 
-    const [image] = useImage(src);
+    const [image] = useImage(src, "anonymous");
 
     const imageRef = useRef();
     const transformerRef = useRef();

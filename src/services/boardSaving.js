@@ -29,7 +29,7 @@ export const saveBoard = async ({
         date,
         updatedAt: serverTimestamp(),
         public: isPublic,
-        preview_image: previewImage,
+        previewImage: previewImage,
     };
 
     await setDoc(boardRef, boardData);

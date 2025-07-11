@@ -16,6 +16,9 @@ import StickerLibrary from "../components/StickerLibrary";
 import "../components/toolBar.css";
 import "../styles/errorMessage.css";
 
+const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
 const CreateBoard = () => {
     const [elements, setElements] = useState([]);
     const [date, setDate] = useState("2025-07-11");
@@ -178,39 +181,90 @@ const CreateBoard = () => {
     };
 
     const handleSaveBoard = async () => {
+        console.log("handleSaveBoard triggered");
+
         if (!user) {
-            return console.log("You must be logged in to save!");
+            console.log("User not logged in, abort saving");
+            return;
         }
-        if (elements.length === 0) {
-            setError(
-                "Why dont you add something to your wonderful board before saving 😏"
-            );
+
+        if (!elements.length) {
+            setError("Why don't you add something before saving 😏");
+            return;
         }
+
+        if (!stageRef.current) {
+            console.error("stageRef.current is null or undefined");
+            setError("Something went wrong — please try again.");
+            return;
+        }
+        console.log("stageRef.current is available");
+
         try {
+            // Get base64 image string
             const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
+
+            // Convert base64 string to a Blob to upload to cloudinary
+            function dataURLtoBlob(dataurl) {
+                const arr = dataurl.split(",");
+                const mime = arr[0].match(/:(.*?);/)[1];
+                const bstr = atob(arr[1]);
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                return new Blob([u8arr], { type: mime });
+            }
+
+            const blob = dataURLtoBlob(dataURL);
+
+            const formData = new FormData();
+            formData.append("file", blob);
+            formData.append("upload_preset", UPLOAD_PRESET);
+
+            console.log("Uploading preview image to Cloudinary...");
+            const res = await fetch(
+                `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+                {
+                    method: "POST",
+                    body: formData,
+                }
+            );
+
+            const data = await res.json();
+            console.log("Cloudinary upload response:", data);
+
+            if (!res.ok) {
+                throw new Error(
+                    data.error?.message || "Cloudinary upload failed"
+                );
+            }
+
+            console.log("Preview image URL received:", data.secure_url);
+
             await saveBoard({
                 elements,
                 user,
                 date,
                 public: isPublic,
-                previewImage: dataURL,
+                previewImage: data.secure_url,
             });
-            //   setError(null);
-            //   alert("Board saved!");
-        } catch (err) {
-            //   alert("Failed to save board");
-            console.error("Error saving board", err);
+
+            console.log("Board saved successfully with previewImage!");
+        } catch (error) {
+            console.error("Error in handleSaveBoard:", error);
+            setError("Failed to save board. Try again?");
         }
     };
 
     const exportToImage = () => {
-        const uri = stageRef.current.toDataURL({ pixelRatio: 2 });
+        const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
+
         const link = document.createElement("a");
-        link.download = "my-scrapi-board.png";
-        link.href = uri;
-        document.body.appendChild(link);
+        link.download = "scrapi-board-export.png";
+        link.href = dataURL;
         link.click();
-        document.body.removeChild(link);
     };
 
     return (
