@@ -357,19 +357,22 @@ const CreateBoard = () => {
         <p className="error-text">{error}</p>
       </div>
     );
-
+        return(
+            <div className="create-board-page">
             <button onClick={handleSaveBoard}>Save 💾</button>
             <button onClick={exportToImage}>Export 📤</button>
             <button onClick={handleDeleteBoard} className="toolbar-button delete">🗑️ Delete Board</button>
 
-            <label>
-                Make public?
-                <input
-                    type="checkbox"
-                    checked={isPublic}
-                    onChange={(e) => setIsPublic(e.target.checked)}
-                />
-            </label>
+            <label className="toggle-container">
+        Make public?
+        <input
+          type="checkbox"
+          checked={isPublic}
+          onChange={(e) => setIsPublic(e.target.checked)}
+          className="toggle-checkbox"
+        />
+        <span className="toggle-slider"></span>
+      </label>
             <DatePicker date={date} onDateChange={setDate} />
 
             <Toolbar
