@@ -184,7 +184,7 @@ const CreateBoard = () => {
         console.log("handleSaveBoard triggered");
 
         if (!user) {
-            console.log("User not logged in, abort saving");
+            console.log("User not logged in, not saved");
             return;
         }
 
@@ -195,7 +195,7 @@ const CreateBoard = () => {
 
         if (!stageRef.current) {
             console.error("stageRef.current is null or undefined");
-            setError("Something went wrong — please try again.");
+            setError("Something went wrong please try again.");
             return;
         }
         console.log("stageRef.current is available");

@@ -17,13 +17,9 @@ const PostCard = ({ board }) => {
                 <div className="">Board Date: {formattedDate}</div>
                 <div className="">Last Updated: {formattedUpdatedAt}</div>
                 {previewImage ? (
-                    <img
-                        src={previewImage}
-                        alt={`Board by ${userId}`}
-                        className="w-full h-auto object-contain rounded-md"
-                    />
+                    <img src={previewImage} alt={`Board by ${userId}`} />
                 ) : (
-                    <p className="text-gray-400 italic">No preview available</p>
+                    <p>No preview available</p>
                 )}
             </div>
         </li>
