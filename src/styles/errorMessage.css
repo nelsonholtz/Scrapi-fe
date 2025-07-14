@@ -1,18 +1,29 @@
-.error-message {
-  color: #ff4d4f;
-  background: #fff2f0;
-  border: 1px solid #ffccc7;
+.error-container {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
-  padding: 40px 40px;
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  padding: 40px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   text-align: center;
   min-width: 300px;
   max-width: 80vw;
+  color: #ff4d4f;
+}
+
+.error-whale {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.error-text {
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .close-btn {

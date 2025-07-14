@@ -7,7 +7,6 @@ import { saveBoard, getUserBoard } from "../services/boardSaving";
 import Toolbar from "../components/Toolbar";
 import DraggableImage from "../components/DraggableImage";
 import EditableText from "../components/EditableText";
-import ToolbarPlaceholder from "../components/placeholderForCSS";
 import DatePicker from "../components/DatePicker";
 import FloatingToolbar from "../components/FloatingToolbar";
 import StickerLibrary from "../components/StickerLibrary";
@@ -22,136 +21,148 @@ const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 const today = new Date().toISOString().split("T")[0];
 
 const CreateBoard = () => {
-    const [elements, setElements] = useState([]);
-    const { datePath } = useParams();
-    const initialDate = datePath || today;
-    const [date, setDate] = useState(initialDate);
+  const [elements, setElements] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    const [selectedId, setSelectedId] = useState(null);
-    const [error, setError] = useState(null);
-    const [selectedFont, setSelectedFont] = useState("Arial");
+  const { datePath } = useParams();
+  const initialDate = datePath || today; //if no datePath use today's date
+  const [date, setDate] = useState(initialDate);
 
-    const [history, setHistory] = useState([]);
-    const [redoStack, setRedoStack] = useState([]);
-    const [isPublic, setIsPublic] = useState(false);
-    const [showStickerLibrary, setShowStickerLibrary] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const [error, setError] = useState(null);
+  const [selectedFont, setSelectedFont] = useState("Arial");
 
-    const stageRef = useRef();
-    const { user } = useUser();
+  const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
-    const selectedElement = elements.find((el) => el.id === selectedId);
-    const isTextSelected = selectedElement?.type === "text";
+  const [history, setHistory] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
+  const [isPublic, setIsPublic] = useState(false);
+  const [showStickerLibrary, setShowStickerLibrary] = useState(false);
 
-    useEffect(() => {
-        if (user && date) {
-            getUserBoard(user.uid, date)
-                .then((board) => {
-                    if (board) {
-                        setElements(board.elements || []);
-                        setIsPublic(!!board.public);
-                    } else {
-                        setElements([]);
-                        setIsPublic(false);
-                    }
-                })
-                .catch((err) => {
-                    setError(err);
-                    console.error("Failed to load board", err);
-                });
-        }
-    }, [user, date]);
+  const stageRef = useRef();
+  const { user } = useUser();
 
-    const pushToHistory = useCallback((newElements) => {
-        setHistory((prev) => [...prev, newElements]);
-        setRedoStack([]); // Clear redo stack on new action
-    }, []);
+  const selectedElement = elements.find((el) => el.id === selectedId);
+  const isTextSelected = selectedElement?.type === "text";
 
-    const handleAddElement = useCallback(
-        (elementType, elementData) => {
-            const newElement = {
-                id: uuidv4(),
-                type: elementType,
-                ...elementData,
-                x: 200,
-                y: 200,
-                text: elementData?.text || "text",
-                fontSize: 20,
-            };
-            setElements((prev) => {
-                const newElements = [...prev, newElement];
-                pushToHistory(newElements);
-                return newElements;
-            });
-        },
-        [pushToHistory]
-    );
-
-    const handleAddImageElement = useCallback(
-        (imageUrl) => {
-            try {
-                const newImageElement = {
-                    id: uuidv4(),
-                    type: "image",
-                    src: imageUrl,
-                    x: 200,
-                    y: 200,
-                    scaleX: 1,
-                    scaleY: 1,
-                    rotation: 0,
-                };
-                setElements((prev) => {
-                    const newElements = [...prev, newImageElement];
-                    pushToHistory(newElements);
-                    return newElements;
-                });
-            } catch (err) {
-                setError("This image is hiding, please try again");
-                console.error("This image has been lost in the scrapbook", err);
-            }
-        },
-        [pushToHistory]
-    );
-
-    const handleTextChange = (id, newText) => {
-        setElements((prev) => {
-            const newElements = prev.map((el) =>
-                el.id === id ? { ...el, text: newText } : el
-            );
-            const cloned = JSON.parse(JSON.stringify(newElements));
-            setRedoStack([]);
-            setHistory((prevHistory) => [...prevHistory, cloned]);
-            return newElements;
+  useEffect(() => {
+    if (user && date) {
+      setLoading(true);
+      getUserBoard(user.uid, date)
+        .then((board) => {
+          if (board) {
+            setElements(board.elements || []);
+            setIsPublic(!!board.public);
+          } else {
+            setElements([]);
+            setIsPublic(false);
+          }
+        })
+        .catch((err) => {
+          setError(err);
+          console.error("Failed to load board", err);
+        })
+        .finally(() => {
+          setLoading(false);
         });
-    };
+    }
+  }, [user, date]);
 
-    const handleUpdateElement = (id, updates) => {
+  const pushToHistory = useCallback((newElements) => {
+    setHistory((prev) => [...prev, newElements]);
+    setRedoStack([]); // Clear redo stack on new action
+  }, []);
+
+  const handleAddElement = useCallback(
+    (elementType, elementData) => {
+      const newElement = {
+        id: uuidv4(),
+        type: elementType,
+        ...elementData,
+        x: 200,
+        y: 200,
+        text: elementData?.text || "text",
+        fontSize: 20,
+      };
+      setElements((prev) => {
+        const newElements = [...prev, newElement];
+        pushToHistory(newElements); // push the updated array, not old 'elements'
+        return newElements;
+      });
+    },
+    [pushToHistory]
+  );
+
+  const handleAddImageElement = useCallback(
+    (imageUrl) => {
+      try {
+        const newImageElement = {
+          id: uuidv4(),
+          type: "image",
+          src: imageUrl,
+          x: 200,
+          y: 200,
+          scaleX: 1,
+          scaleY: 1,
+          rotation: 0,
+        };
         setElements((prev) => {
-            const newElements = prev.map((el) =>
-                el.id === id ? { ...el, ...updates } : el
-            );
-            pushToHistory(newElements);
-            return newElements;
+          const newElements = [...prev, newImageElement];
+          pushToHistory(newElements);
+          return newElements;
         });
-    };
+      } catch (err) {
+        setError("This image is hiding, please try again");
+        console.error("This image has been lost in the scrapbook", err);
+      }
+    },
+    [pushToHistory]
+  );
 
-    const handleDelete = () => {
-        if (!selectedId) return;
-        setElements((prev) => {
-            const newElements = prev.filter((el) => el.id !== selectedId);
-            pushToHistory(newElements);
-            return newElements;
-        });
-        setSelectedId(null);
-    };
+  const handleTextChange = (id, newText) => {
+    setElements((prev) => {
+      const newElements = prev.map((el) =>
+        el.id === id ? { ...el, text: newText } : el
+      );
 
-    const handleUndo = () => {
-        if (history.length === 0) return;
-        const previous = history[history.length - 1];
-        setRedoStack((prev) => [...prev, elements]);
-        setHistory((prev) => prev.slice(0, -1));
-        setElements(previous);
-        setSelectedId(null);
-    };
+      const cloned = JSON.parse(JSON.stringify(newElements));
+      setRedoStack([]); // Clear redo on typing
+      setHistory((prevHistory) => [...prevHistory, cloned]);
+
+      return newElements;
+    });
+  };
+
+  const handleUpdateElement = (id, updates) => {
+    setElements((prev) => {
+      const newElements = prev.map((el) =>
+        el.id === id ? { ...el, ...updates } : el
+      );
+      pushToHistory(newElements);
+      return newElements;
+    });
+  };
+
+  const handleDelete = () => {
+    if (!selectedId) return;
+    setElements((prev) => {
+      const newElements = prev.filter((el) => el.id !== selectedId);
+      pushToHistory(newElements);
+      return newElements;
+    });
+    setSelectedId(null);
+  };
+
+  const handleUndo = () => {
+    if (history.length === 0) return;
+    const previous = history[history.length - 1];
+    setRedoStack((prev) => [...prev, elements]);
+    setHistory((prev) => prev.slice(0, -1));
+    setElements(previous);
+    setSelectedId(null);
+  };
 
     const handleRedo = () => {
         if (redoStack.length === 0) return;
@@ -171,125 +182,195 @@ const CreateBoard = () => {
         setSelectedId(null);
     };
 
-    const moveLayer = (direction) => {
-        setElements((prev) => {
-            const index = prev.findIndex((element) => element.id === selectedId);
-            if (index < 0) return prev;
+  const moveLayer = (direction) => {
+    setElements((prev) => {
+      const index = prev.findIndex((element) => element.id === selectedId);
+      if (index < 0) return prev;
 
-            const newIndex = direction === "up" ? index + 1 : index - 1;
-            if (newIndex < 0 || newIndex >= prev.length) return prev;
+      const newIndex = direction === "up" ? index + 1 : index - 1;
+      if (newIndex < 0 || newIndex >= prev.length) return prev;
 
-            const newElements = [...prev];
-            const [movedElement] = newElements.splice(index, 1);
-            newElements.splice(newIndex, 0, movedElement);
+      const newElements = [...prev];
+      const [movedElement] = newElements.splice(index, 1);
+      newElements.splice(newIndex, 0, movedElement);
 
-            pushToHistory(newElements);
-            return newElements;
-        });
-    };
+      pushToHistory(newElements);
+      return newElements;
+    });
+  };
 
-    const handleSaveBoard = async () => {
-        console.log("handleSaveBoard triggered");
+  const handleSaveBoard = async () => {
+    console.log("handleSaveBoard triggered");
 
-        if (!user) {
-            console.log("User not logged in, not saved");
-            return;
+    if (!user) {
+      console.log("User not logged in, not saved");
+      return;
+    }
+
+    if (!elements.length) {
+      setError("Why don't you add something before saving 😏");
+      return;
+    }
+
+    if (!stageRef.current) {
+      console.error("stageRef.current is null or undefined");
+      setError("Something went wrong please try again.");
+      return;
+    }
+    console.log("stageRef.current is available");
+
+    setSaving(true);
+
+    try {
+      // Get base64 image string
+      const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
+
+      // Convert base64 string to a Blob to upload to cloudinary
+      function dataURLtoBlob(dataurl) {
+        const arr = dataurl.split(",");
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
         }
+        return new Blob([u8arr], { type: mime });
+      }
 
-        if (!elements.length) {
-            setError("Why don't you add something before saving 😏");
-            return;
+      const blob = dataURLtoBlob(dataURL);
+
+      const formData = new FormData();
+      formData.append("file", blob);
+      formData.append("upload_preset", UPLOAD_PRESET);
+
+      console.log("Uploading preview image to Cloudinary...");
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
         }
+      );
 
-        if (!stageRef.current) {
-            console.error("stageRef.current is null or undefined");
-            setError("Something went wrong please try again.");
-            return;
-        }
+      const data = await res.json();
+      console.log("Cloudinary upload response:", data);
 
-        try {
-            const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
+      if (!res.ok) {
+        throw new Error(data.error?.message || "Cloudinary upload failed");
+      }
 
-            function dataURLtoBlob(dataurl) {
-                const arr = dataurl.split(",");
-                const mime = arr[0].match(/:(.*?);/)[1];
-                const bstr = atob(arr[1]);
-                let n = bstr.length;
-                const u8arr = new Uint8Array(n);
-                while (n--) {
-                    u8arr[n] = bstr.charCodeAt(n);
-                }
-                return new Blob([u8arr], { type: mime });
-            }
+      console.log("Preview image URL received:", data.secure_url);
 
-            const blob = dataURLtoBlob(dataURL);
+      await saveBoard({
+        elements,
+        user,
+        date,
+        public: isPublic,
+        previewImage: data.secure_url,
+      });
 
-            const formData = new FormData();
-            formData.append("file", blob);
-            formData.append("upload_preset", UPLOAD_PRESET);
+      console.log("Board saved successfully with previewImage!");
+    } catch (error) {
+      console.error("Error in handleSaveBoard:", error);
+      setError("Failed to save board. Try again?");
+    } finally {
+      setSaving(false);
+    }
+  };
 
-            const res = await fetch(
-                `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-                {
-                    method: "POST",
-                    body: formData,
-                }
-            );
+  const exportToImage = () => {
+    setExporting(true);
 
-            const data = await res.json();
+    const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
 
-            if (!res.ok) {
-                throw new Error(data.error?.message || "Cloudinary upload failed");
-            }
+    const link = document.createElement("a");
+    link.download = "scrapi-board-export.png";
+    link.href = dataURL;
+    link.click();
 
-            await saveBoard({
-                elements,
-                user,
-                date,
-                public: isPublic,
-                previewImage: data.secure_url,
-            });
+    setExporting(false);
+  };
 
-            console.log("Board saved successfully with previewImage!");
-        } catch (error) {
-            console.error("Error in handleSaveBoard:", error);
-            setError("Failed to save board. Try again?");
-        }
-    };
-
-    const exportToImage = () => {
-        const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
-
-        const link = document.createElement("a");
-        link.download = "scrapi-board-export.png";
-        link.href = dataURL;
-        link.click();
-    };
-
+  if (loading) {
     return (
-        <div className="create-board-page">
-            {error && (
-                <div className="error-message">
-                    {error}
-                    <button onClick={() => setError(null)} className="close-btn">×</button>
-                </div>
-            )}
+      <div className="loading-container">
+        <div className="whale">🐋</div>
+        <div>loading page</div>
+        <div className="dots">
+          <div className="dot" />
+          <div className="dot" />
+          <div className="dot" />
+        </div>
+      </div>
+    );
+  }
 
-            <div style={{ display: "flex", gap: "12px", padding: "12px", alignItems: "center" }}>
-                <button onClick={handleSaveBoard} className="toolbar-button">💾 Save</button>
-                <button onClick={exportToImage} className="toolbar-button">📤 Export</button>
-                <button onClick={handleDeleteBoard} className="toolbar-button delete">🗑️ Delete Board</button>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={isPublic}
-                        onChange={(e) => setIsPublic(e.target.checked)}
-                        style={{ marginLeft: "12px" }}
-                    />
-                    Make public?
-                </label>
-                <DatePicker date={date} onDateChange={setDate} />
-            </div>
+  if (saving) {
+    return (
+      <div className="loading-container">
+        <div className="whale">🐋</div>
+        <div>saving board</div>
+        <div className="dots">
+          <div className="dot" />
+          <div className="dot" />
+          <div className="dot" />
+        </div>
+      </div>
+    );
+  }
+
+  if (exporting) {
+    return (
+      <div className="loading-container">
+        <div className="whale">🐋</div>
+        <div>exporting image</div>
+        <div className="dots">
+          <div className="dot" />
+          <div className="dot" />
+          <div className="dot" />
+        </div>
+      </div>
+    );
+  }
+
+  if (uploading) {
+    return (
+      <div className="loading-container">
+        <div className="whale">🐋</div>
+        <div>uploading image</div>
+        <div className="dots">
+          <div className="dot" />
+          <div className="dot" />
+          <div className="dot" />
+        </div>
+      </div>
+    );
+  }
+  if (error)
+    return (
+      <div className="error-container">
+        <button className="close-btn" onClick={() => setError(null)}>
+          ×
+        </button>
+        <div className="error-whale">🐳</div>
+        <p className="error-text">{error}</p>
+      </div>
+    );
+
+            <button onClick={handleSaveBoard}>Save 💾</button>
+            <button onClick={exportToImage}>Export 📤</button>
+            <button onClick={handleDeleteBoard} className="toolbar-button delete">🗑️ Delete Board</button>
+
+            <label>
+                Make public?
+                <input
+                    type="checkbox"
+                    checked={isPublic}
+                    onChange={(e) => setIsPublic(e.target.checked)}
+                />
+            </label>
+            <DatePicker date={date} onDateChange={setDate} />
 
             <Toolbar
                 onAddText={() => handleAddElement("text", { text: "New Text" })}
@@ -302,13 +383,11 @@ const CreateBoard = () => {
                 selectedId={selectedId}
                 onOpenStickerLibrary={() => setShowStickerLibrary(true)}
             />
-
             <StickerLibrary
                 isOpen={showStickerLibrary}
                 onClose={() => setShowStickerLibrary(false)}
                 onSelectSticker={(src) => handleAddElement("image", { src })}
             />
-
             <Stage
                 ref={stageRef}
                 width={window.innerWidth}
@@ -361,7 +440,6 @@ const CreateBoard = () => {
                     })}
                 </Layer>
             </Stage>
-
             {selectedId && (
                 <FloatingToolbar
                     onMoveUp={() => moveLayer("up")}
