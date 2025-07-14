@@ -18,10 +18,11 @@ import "../styles/errorMessage.css";
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+const today = new Date().toISOString().split("T")[0];
 
 const CreateBoard = () => {
     const [elements, setElements] = useState([]);
-    const [date, setDate] = useState("2025-07-11");
+    const [date, setDate] = useState(today);
     const [selectedId, setSelectedId] = useState(null);
     const [error, setError] = useState(null);
     const [selectedFont, setSelectedFont] = useState("Arial");
