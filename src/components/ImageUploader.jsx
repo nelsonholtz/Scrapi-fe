@@ -23,14 +23,8 @@ const ImageUploader = ({ onUploadingComplete }) => {
 
     const handleFileChange = async (e) => {
         const file = e.target.files[0];
-        const filename =
-            typeof imageUrl === "string" ? imageUrl : imageUrl.name;
-        if (!file) return;
 
-        if (!ValidImage(filename)) {
-            setError("Scrapi only accepts jpeg and png files 🐧");
-            return;
-        }
+        if (!file) return;
 
         if (!user) {
             console.log("please login");
