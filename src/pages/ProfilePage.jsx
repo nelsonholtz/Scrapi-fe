@@ -2,9 +2,10 @@ import CalendarComponent from "../components/CalendarComponent";
 import { useUser } from "../contexts/UserContext";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { firebaseAuth, db } from "../services/firebase";
+import { db } from "../services/firebase";
 import "./ProfilePage.css";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import AvatarUploader from "../components/LoginComponents/avatarAndCropping";
 
 const ProfilePage = () => {
   const { user } = useUser();
@@ -43,6 +44,16 @@ const ProfilePage = () => {
 
   const handleChange = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
+  };
+
+  const handleAvatarUploadSuccess = (url) => {
+    setUserData((prev) => ({ ...prev, avatarURL: url }));
+    if (user) {
+      const docRef = doc(db, "users", user.uid);
+      updateDoc(docRef, { avatarURL: url }).catch((error) => {
+        console.error("Failed to update avatar URL in Firestore:", error);
+      });
+    }
   };
 
   const handleUpdate = () => {
@@ -99,26 +110,21 @@ const ProfilePage = () => {
         required
       />
 
-      <label htmlFor="avatarURL">Avatar URL</label>
-      <input
-        id="avatarURL"
-        name="avatarURL"
-        type="url"
-        value={userData.avatarURL}
-        onChange={handleChange}
-      />
+      <h4> Avatar</h4>
       {userData.avatarURL && (
         <img
           src={userData.avatarURL}
-          alt="Avatar Preview"
+          alt="Avatar"
           style={{
             width: 100,
             height: 100,
             borderRadius: "50%",
-            marginTop: 10,
+            marginBottom: 10,
           }}
         />
       )}
+
+      <AvatarUploader user={user} onUploadSuccess={handleAvatarUploadSuccess} />
 
       <label>Email</label>
       <input type="email" value={userData.email} disabled />
