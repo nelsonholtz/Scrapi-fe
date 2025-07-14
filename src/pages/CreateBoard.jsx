@@ -7,14 +7,14 @@ import { saveBoard, getUserBoard } from "../services/boardSaving";
 import Toolbar from "../components/Toolbar";
 import DraggableImage from "../components/DraggableImage";
 import EditableText from "../components/EditableText";
-//import LogOut from "../components/LoginComponents/LogOut";
 import ToolbarPlaceholder from "../components/placeholderForCSS";
 import DatePicker from "../components/DatePicker";
 import FloatingToolbar from "../components/FloatingToolbar";
-
 import StickerLibrary from "../components/StickerLibrary";
+
 import "../components/toolBar.css";
 import "../styles/errorMessage.css";
+
 import { useParams } from "react-router-dom";
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
@@ -23,9 +23,8 @@ const today = new Date().toISOString().split("T")[0];
 
 const CreateBoard = () => {
     const [elements, setElements] = useState([]);
-
     const { datePath } = useParams();
-    const initialDate = datePath || today; //if no datePath use today's date
+    const initialDate = datePath || today;
     const [date, setDate] = useState(initialDate);
 
     const [selectedId, setSelectedId] = useState(null);
@@ -80,7 +79,7 @@ const CreateBoard = () => {
             };
             setElements((prev) => {
                 const newElements = [...prev, newElement];
-                pushToHistory(newElements); // push the updated array, not old 'elements'
+                pushToHistory(newElements);
                 return newElements;
             });
         },
@@ -105,7 +104,6 @@ const CreateBoard = () => {
                     pushToHistory(newElements);
                     return newElements;
                 });
-                // setError(null);
             } catch (err) {
                 setError("This image is hiding, please try again");
                 console.error("This image has been lost in the scrapbook", err);
@@ -119,12 +117,9 @@ const CreateBoard = () => {
             const newElements = prev.map((el) =>
                 el.id === id ? { ...el, text: newText } : el
             );
-
-            //Deep clone before saving to history so it captures the actual text
             const cloned = JSON.parse(JSON.stringify(newElements));
-            setRedoStack([]); // Clear redo on typing
+            setRedoStack([]);
             setHistory((prevHistory) => [...prevHistory, cloned]);
-
             return newElements;
         });
     };
@@ -167,11 +162,18 @@ const CreateBoard = () => {
         setSelectedId(null);
     };
 
+    const handleDeleteBoard = () => {
+        if (!window.confirm("Are you sure you want to delete the board? This cannot be undone.")) return;
+
+        setElements([]);
+        setHistory([]);
+        setRedoStack([]);
+        setSelectedId(null);
+    };
+
     const moveLayer = (direction) => {
         setElements((prev) => {
-            const index = prev.findIndex(
-                (element) => element.id === selectedId
-            );
+            const index = prev.findIndex((element) => element.id === selectedId);
             if (index < 0) return prev;
 
             const newIndex = direction === "up" ? index + 1 : index - 1;
@@ -204,13 +206,10 @@ const CreateBoard = () => {
             setError("Something went wrong please try again.");
             return;
         }
-        console.log("stageRef.current is available");
 
         try {
-            // Get base64 image string
             const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
 
-            // Convert base64 string to a Blob to upload to cloudinary
             function dataURLtoBlob(dataurl) {
                 const arr = dataurl.split(",");
                 const mime = arr[0].match(/:(.*?);/)[1];
@@ -229,7 +228,6 @@ const CreateBoard = () => {
             formData.append("file", blob);
             formData.append("upload_preset", UPLOAD_PRESET);
 
-            console.log("Uploading preview image to Cloudinary...");
             const res = await fetch(
                 `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
                 {
@@ -239,15 +237,10 @@ const CreateBoard = () => {
             );
 
             const data = await res.json();
-            console.log("Cloudinary upload response:", data);
 
             if (!res.ok) {
-                throw new Error(
-                    data.error?.message || "Cloudinary upload failed"
-                );
+                throw new Error(data.error?.message || "Cloudinary upload failed");
             }
-
-            console.log("Preview image URL received:", data.secure_url);
 
             await saveBoard({
                 elements,
@@ -278,27 +271,25 @@ const CreateBoard = () => {
             {error && (
                 <div className="error-message">
                     {error}
-                    <button
-                        onClick={() => setError(null)}
-                        className="close-btn"
-                    >
-                        ×
-                    </button>
+                    <button onClick={() => setError(null)} className="close-btn">×</button>
                 </div>
             )}
 
-            <button onClick={handleSaveBoard}>Save 💾</button>
-            <button onClick={exportToImage}>Export 📤</button>
-
-            <label>
-                Make public?
-                <input
-                    type="checkbox"
-                    checked={isPublic}
-                    onChange={(e) => setIsPublic(e.target.checked)}
-                />
-            </label>
-            <DatePicker date={date} onDateChange={setDate} />
+            <div style={{ display: "flex", gap: "12px", padding: "12px", alignItems: "center" }}>
+                <button onClick={handleSaveBoard} className="toolbar-button">💾 Save</button>
+                <button onClick={exportToImage} className="toolbar-button">📤 Export</button>
+                <button onClick={handleDeleteBoard} className="toolbar-button delete">🗑️ Delete Board</button>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={isPublic}
+                        onChange={(e) => setIsPublic(e.target.checked)}
+                        style={{ marginLeft: "12px" }}
+                    />
+                    Make public?
+                </label>
+                <DatePicker date={date} onDateChange={setDate} />
+            </div>
 
             <Toolbar
                 onAddText={() => handleAddElement("text", { text: "New Text" })}
@@ -311,11 +302,13 @@ const CreateBoard = () => {
                 selectedId={selectedId}
                 onOpenStickerLibrary={() => setShowStickerLibrary(true)}
             />
+
             <StickerLibrary
                 isOpen={showStickerLibrary}
                 onClose={() => setShowStickerLibrary(false)}
                 onSelectSticker={(src) => handleAddElement("image", { src })}
             />
+
             <Stage
                 ref={stageRef}
                 width={window.innerWidth}
@@ -368,6 +361,7 @@ const CreateBoard = () => {
                     })}
                 </Layer>
             </Stage>
+
             {selectedId && (
                 <FloatingToolbar
                     onMoveUp={() => moveLayer("up")}
