@@ -13,18 +13,16 @@ const ExplorePage = () => {
     }, []);
 
     return (
-        <div className="p-4 max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-4">Explore Boards</h2>
+        <div>
+            <h2>Explore Boards</h2>
             {publicBoards.length === 0 ? (
                 <p>No public boards available yet.</p>
             ) : (
-                <ul>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {publicBoards.map((board) => (
-                            <PostCard key={board.id} board={board} />
-                        ))}
-                    </div>
-                </ul>
+                <div>
+                    {publicBoards.map((board) => (
+                        <PostCard key={board.id} board={board} />
+                    ))}
+                </div>
             )}
         </div>
     );
