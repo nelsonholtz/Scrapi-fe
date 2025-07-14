@@ -1,0 +1,52 @@
+.calendar-container {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 60px;
+}
+
+.react-calendar {
+  width: 100%;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding-bottom: 1rem;
+}
+
+.react-calendar__navigation {
+  display: flex;
+  height: 100px;
+  margin-bottom: 16px;
+  background: #f8f9fa;
+}
+
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.8em;
+  color: #555;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.react-calendar__month-view__days {
+  margin: 5px 10px;
+}
+
+.react-calendar__tile {
+  margin: 4px;
+  padding: 10px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+}
+
+.calendar-note-indicator {
+  font-size: 20px;
+  margin-top: 15px;
+}

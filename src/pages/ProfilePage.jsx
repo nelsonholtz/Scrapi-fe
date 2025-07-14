@@ -3,7 +3,8 @@ import { useUser } from "../contexts/UserContext";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { firebaseAuth, db } from "../services/firebase";
-import "./ProfilePage.css";
+import "../styles/ProfilePage.css";
+import "../styles/loading.css";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 const ProfilePage = () => {
@@ -18,6 +19,7 @@ const ProfilePage = () => {
     email: "",
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
@@ -27,6 +29,8 @@ const ProfilePage = () => {
     }
 
     const docRef = doc(db, "users", user.uid);
+    setLoading(true);
+    setError(null);
     getDoc(docRef)
       .then((docSnap) => {
         if (docSnap.exists()) {
@@ -35,6 +39,7 @@ const ProfilePage = () => {
       })
       .catch((error) => {
         console.error("Error fetching user data:", error);
+        setError(error);
       })
       .finally(() => {
         setLoading(false);
@@ -63,7 +68,29 @@ const ProfilePage = () => {
       });
   };
 
-  if (loading) return <p>Loading profile...</p>;
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="whale">🐋</div>
+        <div>loading page</div>
+        <div className="dots">
+          <div className="dot"></div>
+          <div className="dot"></div>
+          <div className="dot"></div>
+        </div>
+      </div>
+    );
+  }
+  if (error)
+    return (
+      <div className="error-container">
+        <button className="close-btn" onClick={() => setError(null)}>
+          ×
+        </button>
+        <div className="error-whale">🐳</div>
+        <p className="error-text">Our moodboards aren't flowing right now</p>
+      </div>
+    );
 
   return (
     <div className="profile">
@@ -121,7 +148,12 @@ const ProfilePage = () => {
       )}
 
       <label>Email</label>
-      <input type="email" value={userData.email} disabled />
+      <input
+        type="email"
+        value={userData.email}
+        name="email"
+        onChange={handleChange}
+      />
 
       <button onClick={handleUpdate} disabled={updating}>
         {updating ? "Saving..." : "Save Changes"}
