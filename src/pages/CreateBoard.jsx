@@ -13,6 +13,7 @@ import FloatingToolbar from "../components/FloatingToolbar";
 import StickerLibrary from "../components/StickerLibrary";
 import "../components/toolBar.css";
 import "../styles/errorMessage.css";
+import { useParams } from "react-router-dom";
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
@@ -20,9 +21,13 @@ const today = new Date().toISOString().split("T")[0];
 
 const CreateBoard = () => {
   const [elements, setElements] = useState([]);
-  const [date, setDate] = useState(today);
+  const [loading, setLoading] = useState(false);
+
+  const { datePath } = useParams();
+  const initialDate = datePath || today; //if no datePath use today's date
+  const [date, setDate] = useState(initialDate);
+
   const [selectedId, setSelectedId] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedFont, setSelectedFont] = useState("Arial");
 

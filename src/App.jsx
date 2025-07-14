@@ -16,6 +16,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/create" element={<CreateBoard />} />
+                <Route path="/board/:datePath" element={<CreateBoard />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/explore" element={<ExplorePage />} />
             </Routes>

@@ -7,6 +7,7 @@ import "../styles/ProfilePage.css";
 import "../styles/loading.css";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 
+import AllUserBoards from "../components/AllUserBoards";
 const ProfilePage = () => {
   const { user } = useUser();
   const navigate = useNavigate();
@@ -93,77 +94,77 @@ const ProfilePage = () => {
     );
 
   return (
-    <div className="profile">
-      <h1 className="script-text">Edit Your Profile</h1>
+    <>
+      <div className="profile">
+        <h1 className="script-text">Edit Your Profile</h1>
 
-      <label htmlFor="firstName">First Name</label>
-      <input
-        id="firstName"
-        name="firstName"
-        type="text"
-        value={userData.firstName}
-        onChange={handleChange}
-        required
-      />
-
-      <label htmlFor="lastName">Last Name</label>
-      <input
-        id="lastName"
-        name="lastName"
-        type="text"
-        value={userData.lastName}
-        onChange={handleChange}
-        required
-      />
-
-      <label htmlFor="username">Username</label>
-      <input
-        id="username"
-        name="username"
-        type="text"
-        value={userData.username}
-        onChange={handleChange}
-        required
-      />
-
-      <label htmlFor="avatarURL">Avatar URL</label>
-      <input
-        id="avatarURL"
-        name="avatarURL"
-        type="url"
-        value={userData.avatarURL}
-        onChange={handleChange}
-      />
-      {userData.avatarURL && (
-        <img
-          src={userData.avatarURL}
-          alt="Avatar Preview"
-          style={{
-            width: 100,
-            height: 100,
-            borderRadius: "50%",
-            marginTop: 10,
-          }}
+        <label htmlFor="firstName">First Name</label>
+        <input
+          id="firstName"
+          name="firstName"
+          type="text"
+          value={userData.firstName}
+          onChange={handleChange}
+          required
         />
-      )}
 
-      <label>Email</label>
-      <input
-        type="email"
-        value={userData.email}
-        name="email"
-        onChange={handleChange}
-      />
+        <label htmlFor="lastName">Last Name</label>
+        <input
+          id="lastName"
+          name="lastName"
+          type="text"
+          value={userData.lastName}
+          onChange={handleChange}
+          required
+        />
 
-      <button onClick={handleUpdate} disabled={updating}>
-        {updating ? "Saving..." : "Save Changes"}
-      </button>
+        <label htmlFor="username">Username</label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          value={userData.username}
+          onChange={handleChange}
+          required
+        />
 
-      <div style={{ marginTop: "30px" }}>
-        <h2>Your Calendar</h2>
-        <CalendarComponent user={user} />
+        <label htmlFor="avatarURL">Avatar URL</label>
+        <input
+          id="avatarURL"
+          name="avatarURL"
+          type="url"
+          value={userData.avatarURL}
+          onChange={handleChange}
+        />
+        {userData.avatarURL && (
+          <img
+            src={userData.avatarURL}
+            alt="Avatar Preview"
+            style={{
+              width: 100,
+              height: 100,
+              borderRadius: "50%",
+              marginTop: 10,
+            }}
+          />
+        )}
+
+        <label>Email</label>
+        <input type="email" value={userData.email} disabled />
+
+        <button onClick={handleUpdate} disabled={updating}>
+          {updating ? "Saving..." : "Save Changes"}
+        </button>
+
+        <div style={{ marginTop: "30px" }}>
+          <h2>Your Calendar</h2>
+          <CalendarComponent user={user} />
+        </div>
       </div>
-    </div>
+      <div>
+        <AllUserBoards user={user} />
+      </div>
+    </>
   );
 };
 
