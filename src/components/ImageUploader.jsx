@@ -1,12 +1,18 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useUser } from "../contexts/UserContext";
 import { RiImageAddFill } from "react-icons/ri";
 import "../styles/toolbar-update.css";
+import "../styles/loading.css";
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
-const ImageUploader = ({ onUploadingComplete, onUploadError }) => {
+const ImageUploader = ({
+  onUploadingComplete,
+  onUploadError,
+  onUploadingStart,
+  onUploadingEnd,
+}) => {
   const { user } = useUser();
   const fileRef = useRef();
 
@@ -37,6 +43,10 @@ const ImageUploader = ({ onUploadingComplete, onUploadError }) => {
       return;
     }
 
+    if (onUploadingStart) {
+      onUploadingStart();
+    }
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", UPLOAD_PRESET);
@@ -61,6 +71,10 @@ const ImageUploader = ({ onUploadingComplete, onUploadError }) => {
     } catch (err) {
       onUploadError?.(err.message || "Upload failed");
       console.error("Upload failed", err);
+    } finally {
+      if (onUploadingEnd) {
+        onUploadingEnd();
+      }
     }
   };
 

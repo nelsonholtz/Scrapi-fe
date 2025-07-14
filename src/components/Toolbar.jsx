@@ -16,6 +16,8 @@ const Toolbar = ({
   onUploadError,
   onOpenStickerLibrary,
   onUploadingComplete,
+  onUploadingStart,
+  onUploadingEnd,
 }) => {
   return (
     <div className="toolbar-container">
@@ -29,6 +31,8 @@ const Toolbar = ({
           <ImageUploader
             onUploadingComplete={onUploadingComplete}
             onUploadError={onUploadError}
+            onUploadingStart={onUploadingStart}
+            onUploadingEnd={onUploadingEnd}
           />
         </li>
 

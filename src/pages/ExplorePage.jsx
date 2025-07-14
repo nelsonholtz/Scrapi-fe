@@ -43,7 +43,7 @@ const ExplorePage = () => {
           ×
         </button>
         <div className="error-whale">🐳</div>
-        <p className="error-text">Our moodboards aren't flowing right now</p>
+        <p className="error-text">{error}</p>
       </div>
     );
 
