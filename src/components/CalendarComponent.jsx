@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 import { fetchUserBoards, getUserBoard } from "../services/boardSaving";
 import "react-calendar/dist/Calendar.css";
-//import "../styles/calendar.css";
-import "../styles/calendar-with-panel.css";
+import "../styles/calendar.css";
+//import "../styles/calendar-with-panel.css";
 import { useParams } from "react-router-dom";
 
 const CalendarComponent = ({ user }) => {
