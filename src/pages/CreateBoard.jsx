@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Stage, Layer } from "react-konva";
+import { Stage, Layer, Line } from "react-konva";
 import { v4 as uuidv4 } from "uuid";
 import { useUser } from "../contexts/UserContext";
 import { saveBoard, getUserBoard } from "../services/boardSaving";
@@ -10,6 +10,7 @@ import EditableText from "../components/EditableText";
 import DatePicker from "../components/DatePicker";
 import FloatingToolbar from "../components/FloatingToolbar";
 import StickerLibrary from "../components/StickerLibrary";
+import DrawingTool from "../components/drawing";
 
 import "../components/toolBar.css";
 import "../styles/errorMessage.css";
@@ -41,6 +42,11 @@ const CreateBoard = () => {
   const [isPublic, setIsPublic] = useState(false);
   const [showStickerLibrary, setShowStickerLibrary] = useState(false);
 
+  const [tool, setTool] = useState("brush");
+  const [lines, setLines] = useState([]);
+  const isDrawing = useRef(false);
+  const [isDrawingMode, setIsDrawingMode] = useState(false);
+
   const stageRef = useRef();
   const { user } = useUser();
 
@@ -70,8 +76,8 @@ const CreateBoard = () => {
     }
   }, [user, date]);
 
-  const pushToHistory = useCallback((newElements) => {
-    setHistory((prev) => [...prev, newElements]);
+  const pushToHistory = useCallback((newElements, newLines) => {
+    setHistory((prev) => [...prev, { elements: newElements, lines: newLines }]);
     setRedoStack([]); // Clear redo stack on new action
   }, []);
 
@@ -88,7 +94,7 @@ const CreateBoard = () => {
       };
       setElements((prev) => {
         const newElements = [...prev, newElement];
-        pushToHistory(newElements); // push the updated array, not old 'elements'
+        pushToHistory(newElements, lines); // push the updated array, not old 'elements'
         return newElements;
       });
     },
@@ -140,7 +146,7 @@ const CreateBoard = () => {
       const newElements = prev.map((el) =>
         el.id === id ? { ...el, ...updates } : el
       );
-      pushToHistory(newElements);
+      pushToHistory(newElements, lines);
       return newElements;
     });
   };
@@ -149,7 +155,7 @@ const CreateBoard = () => {
     if (!selectedId) return;
     setElements((prev) => {
       const newElements = prev.filter((el) => el.id !== selectedId);
-      pushToHistory(newElements);
+      pushToHistory(newElements, lines);
       return newElements;
     });
     setSelectedId(null);
@@ -158,18 +164,22 @@ const CreateBoard = () => {
   const handleUndo = () => {
     if (history.length === 0) return;
     const previous = history[history.length - 1];
-    setRedoStack((prev) => [...prev, elements]);
+    setRedoStack((prev) => [...prev, { elements, lines }]);
     setHistory((prev) => prev.slice(0, -1));
-    setElements(previous);
+    setElements(previous.elements);
+    setLines(previous.lines);
     setSelectedId(null);
   };
 
   const handleRedo = () => {
     if (redoStack.length === 0) return;
+
     const next = redoStack[redoStack.length - 1];
     setRedoStack((prev) => prev.slice(0, -1));
-    setHistory((prev) => [...prev, elements]);
-    setElements(next);
+    setHistory((prev) => [...prev, { elements, lines }]);
+
+    setElements(next.elements);
+    setLines(next.lines);
     setSelectedId(null);
   };
 
@@ -185,6 +195,32 @@ const CreateBoard = () => {
     setHistory([]);
     setRedoStack([]);
     setSelectedId(null);
+    setLines([]);
+  };
+  const handleDrawingMouseDown = (e) => {
+    if (!isDrawingMode) return;
+    isDrawing.current = true;
+    const pos = e.target.getStage().getPointerPosition();
+    setLines((prevLines) => [...prevLines, { tool, points: [pos.x, pos.y] }]);
+  };
+
+  const handleDrawingMouseMove = (e) => {
+    if (!isDrawingMode || !isDrawing.current) return;
+
+    const stage = e.target.getStage();
+    const point = stage.getPointerPosition();
+
+    setLines((prevLines) => {
+      const lastLine = { ...prevLines[prevLines.length - 1] };
+      lastLine.points = lastLine.points.concat([point.x, point.y]);
+      const newLines = [...prevLines.slice(0, -1), lastLine];
+      return newLines;
+    });
+  };
+
+  const handleDrawingMouseUp = () => {
+    if (!isDrawingMode) return;
+    isDrawing.current = false;
   };
 
   const moveLayer = (direction) => {
@@ -199,7 +235,7 @@ const CreateBoard = () => {
       const [movedElement] = newElements.splice(index, 1);
       newElements.splice(newIndex, 0, movedElement);
 
-      pushToHistory(newElements);
+      pushToHistory(newElements, lines);
       return newElements;
     });
   };
@@ -389,6 +425,10 @@ const CreateBoard = () => {
         onSave={handleSaveBoard}
         onExport={exportToImage}
         onDeleteBoard={handleDeleteBoard}
+        isDrawingMode={isDrawingMode}
+        setIsDrawingMode={setIsDrawingMode}
+        tool={tool}
+        setTool={setTool}
       />
       <StickerLibrary
         isOpen={showStickerLibrary}
@@ -402,8 +442,31 @@ const CreateBoard = () => {
         onMouseDown={(e) => {
           const clickedOnEmpty = e.target === e.target.getStage();
           if (clickedOnEmpty) setSelectedId(null);
+          handleDrawingMouseDown(e);
         }}
+        onMouseMove={handleDrawingMouseMove}
+        onMouseUp={handleDrawingMouseUp}
+        onTouchStart={handleDrawingMouseDown}
+        onTouchMove={handleDrawingMouseMove}
+        onTouchEnd={handleDrawingMouseUp}
       >
+        <Layer>
+          {lines.map((line, i) => (
+            <Line
+              key={i}
+              points={line.points}
+              stroke="#df4b26"
+              strokeWidth={tool === "eraser" ? 20 : 5}
+              tension={0.5}
+              lineCap="round"
+              lineJoin="round"
+              globalCompositeOperation={
+                line.tool === "eraser" ? "destination-out" : "source-over"
+              }
+            />
+          ))}
+        </Layer>
+
         <Layer>
           {elements.map((element) => {
             const isSelected = element.id === selectedId;
