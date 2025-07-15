@@ -1,113 +1,201 @@
 .profile {
-  max-width: 400px;
-  margin: 40px auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .profile h1 {
-  text-align: center;
-  font-family: "Brush Script MT", cursive;
-  color: #333;
+    text-align: center;
+    font-family: "Brush Script MT", cursive;
+    color: #333;
 }
 
 .profile label {
-  display: block;
-  margin-top: 15px;
-  margin-bottom: 10px;
-  font-weight: bold;
-  color: #555;
-  display: block;
-  margin-top: 15px;
-  font-weight: bold;
-  color: #555;
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #555;
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #555;
 }
 
 .profile input[type="text"],
 .profile input[type="url"],
 .profile input[type="email"] {
-  width: 100%;
-  padding: 8px 10px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
 .profile button {
-  margin-top: 25px;
-  width: 100%;
-  padding: 10px;
-  background-color: #14213d;
-  border: none;
-  color: white;
-  font-weight: bold;
-  font-size: 16px;
-  border-radius: 4px;
-  cursor: pointer;
+    margin-top: 25px;
+    width: 100%;
+    padding: 10px;
+    background-color: #14213d;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .profile button:disabled {
-  background-color: #14213d;
-  cursor: not-allowed;
+    background-color: #14213d;
+    cursor: not-allowed;
 }
 
 .profile img {
-  display: block;
-  margin: 10px auto 0 auto;
-  border-radius: 50%;
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
+    display: block;
+    margin: 10px auto 0 auto;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
 }
 
 .profile h2 {
-  margin-top: 20px;
-  margin-bottom: 5px;
-  text-align: center;
-  color: #14213d;
+    margin-top: 20px;
+    margin-bottom: 5px;
+    text-align: center;
+    color: #14213d;
 }
 
 .boards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-  padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    padding: 16px;
 }
 
 .board-tile {
-  height: 400px;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
+    height: 400px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
 
-  transition: transform 0.2s ease;
+    transition: transform 0.2s ease;
 }
 
 .board-image {
-  height: 75%;
-  width: 100%;
-  object-fit: cover;
+    height: 75%;
+    width: 100%;
+    object-fit: cover;
 }
 
 .board-info {
-  height: 25%;
-  padding: 8px;
-  text-align: center;
+    height: 25%;
+    padding: 8px;
+    text-align: center;
 }
 
 .board-info p {
-  margin: 0;
-  font-size: 14px;
+    margin: 0;
+    font-size: 14px;
 }
 
 .board-tile:hover {
-  transform: scale(1.03);
+    transform: scale(1.03);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+.profile-page-container {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.profile-header {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+.edit-form {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.edit-form label {
+    font-weight: bold;
+    color: #555;
+    text-align: left;
+}
+
+.edit-form input[type="text"],
+.edit-form input[type="url"],
+.edit-form input[type="email"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.edit-form input[type="text"]:focus,
+.edit-form input[type="url"]:focus,
+.edit-form input[type="email"]:focus {
+    outline: none;
+    border-color: #14213d;
+}
+
+.edit-form button {
+    background-color: #14213d;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100%;
+}
+
+.edit-form button:hover {
+    background-color: #1a1a2e;
 }
