@@ -9,61 +9,85 @@ const EditableText = ({
     text,
     fontSize,
     fontFamily,
+    color,
+    stroke,
+    strokeWidth,
     rotation,
+    fontWeight = "normal",
+    fontStyle = "normal",
+    textDecoration = "none",
     onChange,
     onUpdate,
     stageRef,
     onSelect,
     isSelected,
 }) => {
-    const [isEditing, setIsEditing] = useState(false); // Same var names
-    const [value, setValue] = useState(text); //Initialize input with current text
+    const [isEditing, setIsEditing] = useState(false);
+    const [value, setValue] = useState(text);
     const [localFontSize, setLocalFontSize] = useState(fontSize);
     const inputRef = useRef();
     const textRef = useRef();
     const transformerRef = useRef();
 
+  
+    const konvaFontStyle = `${fontWeight} ${fontStyle}`.trim();
+
+  
+
     useEffect(() => {
         if (isSelected && transformerRef.current && textRef.current) {
-            transformerRef.current.nodes([textRef.current]);
-            transformerRef.current.getLayer().batchDraw();
+           
+            if (textRef.current.getParent()) {
+                transformerRef.current.nodes([textRef.current]);
+                transformerRef.current.getLayer()?.batchDraw();
+            }
+        } else if (transformerRef.current) {
+          
+            transformerRef.current.nodes([]);
         }
     }, [isSelected]);
 
+    useEffect(() => {
+        return () => {
+            if (transformerRef.current) {
+                transformerRef.current.nodes([]);
+            }
+        };
+    }, []);
+
+
     const handleSelect = () => {
-        if (onSelect) {
-            onSelect(id);
-        }
+        if (onSelect) onSelect(id);
     };
 
     const handleDblClick = () => {
         setIsEditing(true);
+        
         setTimeout(() => {
-            inputRef.current?.focus(); // Focus after render
-        }, 0);
+            inputRef.current?.focus();
+        }, 100);
     };
 
     const handleBlur = () => {
         setIsEditing(false);
         if (value !== text) {
-            onChange(id, value); //Update elements with final value
-            onUpdate(id, { text: value }); //Push final value to history
+            onChange(id, value);
+            onUpdate(id, { text: value });
         }
     };
 
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
-            inputRef.current.blur(); //Save on Enter key
+            inputRef.current.blur();
         }
     };
 
     const handleTransformEnd = () => {
         const node = textRef.current;
-        if (!node) return;
+        if (!node || !node.getParent()) return;
 
         const scaleX = node.scaleX();
-        const scaleY = node.scaleY();
 
         node.scaleX(1);
         node.scaleY(1);
@@ -82,21 +106,37 @@ const EditableText = ({
     return (
         <>
             {isEditing ? (
-                <Html>
+                <Html
+                    groupProps={{
+                        x: x,
+                        y: y,
+                        rotation: rotation,
+                    }}
+                >
                     <input
                         ref={inputRef}
                         style={{
                             position: "absolute",
-                            top: y + stageRef.current.container().offsetTop,
-                            left: x + stageRef.current.container().offsetLeft,
-                            fontSize: 20,
-                            border: "1px solid black",
-                            padding: "2px",
+                            top: 0,
+                            left: 0,
+                            fontSize: localFontSize + "px",
+                            fontFamily: fontFamily,
+                            fontWeight: fontWeight,
+                            fontStyle: fontStyle,
+                            textDecoration: textDecoration,
+                            color: color,
+                            padding: "0px",
+                            margin: "0px",
+                            border: "2px solid #007bff",
+                            background: "rgba(255, 255, 255, 0.95)",
+                            outline: "none",
                             zIndex: 1000,
+                            minWidth: "20px",
+                            resize: "none",
                         }}
-                        value={value} // Controlled input
-                        onChange={(e) => setValue(e.target.value)} // Live input update
-                        onBlur={handleBlur} // Save on blur
+                        value={value}
+                        onChange={(e) => setValue(e.target.value)}
+                        onBlur={handleBlur}
                         onKeyDown={handleKeyDown}
                     />
                 </Html>
@@ -106,9 +146,13 @@ const EditableText = ({
                     y={y}
                     rotation={rotation}
                     ref={textRef}
-                    text={text} //Shows correct text from props
+                    text={text}
                     fontSize={localFontSize}
                     fontFamily={fontFamily}
+                    fontStyle={konvaFontStyle}
+                    fill={color}
+                    stroke={stroke}
+                    strokeWidth={strokeWidth}
                     draggable
                     onClick={handleSelect}
                     onDblClick={handleDblClick}
@@ -116,9 +160,22 @@ const EditableText = ({
                         onUpdate(id, {
                             x: e.target.x(),
                             y: e.target.y(),
-                        }); // Update text position
+                        });
                     }}
                     onTransformEnd={handleTransformEnd}
+                />
+            )}
+           
+            {!isEditing && textDecoration === "underline" && (
+                <Text
+                    x={x}
+                    y={y + localFontSize + 2}
+                    rotation={rotation}
+                    text={"_".repeat(Math.max(1, Math.floor(text.length * 0.8)))}
+                    fontSize={localFontSize * 0.1}
+                    fontFamily={fontFamily}
+                    fill={color}
+                    listening={false}
                 />
             )}
             {isSelected && (
