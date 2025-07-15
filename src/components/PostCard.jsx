@@ -66,7 +66,7 @@ const PostCard = ({ board }) => {
                 )}
 
                 <div className="post-card-updated">
-                    Last updated: {formattedUpdatedAt}
+                    Last updated: {formattedUpdatedAt || "Just now"}
                 </div>
             </div>
         </li>

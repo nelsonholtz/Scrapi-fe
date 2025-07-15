@@ -6,6 +6,7 @@ import {
     doc,
     getDoc,
     setDoc,
+    updateDoc,
     serverTimestamp,
     orderBy,
 } from "firebase/firestore";
@@ -35,7 +36,25 @@ export const saveBoard = async ({
     await setDoc(boardRef, boardData);
     return boardRef.id;
 };
+export const updateBoardWithoutPreview = async ({
+    elements,
+    user,
+    date,
+    public: isPublic,
+}) => {
+    if (!user) throw new Error("User not logged in");
 
+    const docId = `${user.uid}_${date}`;
+    const boardRef = doc(db, "boards", docId);
+
+    await updateDoc(boardRef, {
+        elements,
+        public: isPublic,
+        updatedAt: serverTimestamp(),
+    });
+
+    return boardRef.id;
+};
 export const getUserBoard = async (userId, date) => {
     if (!date) throw new Error("Date is required");
 
