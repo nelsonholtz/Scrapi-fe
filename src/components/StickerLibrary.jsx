@@ -20,17 +20,19 @@ export default function StickerLibrary({ isOpen, onClose, onSelectSticker }) {
                         <div key={category}>
                             <h3>{category}</h3>
                             <div className="sticker-grid">
-                                {Object.entries(stickers).map(([name, src]) => (
-                                    <img
-                                        key={name}
-                                        src={src}
-                                        alt={name}
-                                        onClick={() => {
-                                            onSelectSticker(src);
-                                            onClose();
-                                        }}
-                                    />
-                                ))}
+                                {Object.entries(stickers).map(([name, src]) => 
+                                    src && src.trim() !== "" ? (
+                                        <img
+                                            key={name}
+                                            src={src}
+                                            alt={name}
+                                            onClick={() => {
+                                                onSelectSticker(src);
+                                                onClose();
+                                            }}
+                                        />
+                                    ) : null
+                                )}
                             </div>
                         </div>
                     )

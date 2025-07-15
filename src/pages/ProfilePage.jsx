@@ -128,7 +128,13 @@ const ProfilePage = () => {
       <div className="profile-page-container">
         <h1>Your Profile</h1>
         <div className="profile-header">
-          <img src={userData.avatarURL} alt="Avatar" className="avatar" />
+          {userData.avatarURL && userData.avatarURL.trim() !== "" ? (
+            <img src={userData.avatarURL} alt="Avatar" className="avatar" />
+          ) : (
+            <div className="avatar-placeholder">
+              👤
+            </div>
+          )}
           <strong>
             <h2>
               {userData.firstName} {userData.lastName}
@@ -167,7 +173,7 @@ const ProfilePage = () => {
               />
               <div className="avatar-section">
                 <h4> Avatar</h4>
-                {userData.avatarURL && (
+                {userData.avatarURL && userData.avatarURL.trim() !== "" && (
                   <img
                     src={userData.avatarURL}
                     alt="Avatar"

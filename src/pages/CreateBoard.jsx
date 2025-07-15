@@ -14,6 +14,7 @@ import DraggableImage from "../components/DraggableImage";
 import EditableText from "../components/EditableText";
 import DatePicker from "../components/DatePicker";
 import FloatingToolbar from "../components/FloatingToolbar";
+import ToolbarWrapper from "../components/ToolbarWrapper";
 import StickerLibrary from "../components/StickerLibrary";
 
 import "../components/toolBar.css";
@@ -47,6 +48,13 @@ const CreateBoard = () => {
     const [redoStack, setRedoStack] = useState([]);
     const [isPublic, setIsPublic] = useState(false);
     const [showStickerLibrary, setShowStickerLibrary] = useState(false);
+    const [isStrokeEnabled, setIsStrokeEnabled] = useState(false);
+    const [strokeColor, setStrokeColor] = useState("#ffffff");
+
+   
+    const [fontWeight, setFontWeight] = useState("normal");
+    const [fontStyle, setFontStyle] = useState("normal");
+    const [textDecoration, setTextDecoration] = useState("none");
 
     const stageRef = useRef();
     const { user } = useUser();
@@ -113,7 +121,7 @@ const CreateBoard = () => {
 
     const pushToHistory = useCallback((newElements) => {
         setHistory((prev) => [...prev, newElements]);
-        setRedoStack([]); // Clear redo stack on new action
+        setRedoStack([]); 
     }, []);
 
     const handleAddElement = useCallback(
@@ -126,10 +134,15 @@ const CreateBoard = () => {
                 y: 200,
                 text: elementData?.text || "text",
                 fontSize: 20,
+                ...(elementType === "text" && {
+                    fontWeight: "normal",
+                    fontStyle: "normal",
+                    textDecoration: "none",
+                })
             };
             setElements((prev) => {
                 const newElements = [...prev, newElement];
-                pushToHistory(newElements); // push the updated array, not old 'elements'
+                pushToHistory(newElements); 
                 return newElements;
             });
         },
@@ -169,11 +182,32 @@ const CreateBoard = () => {
             );
 
             const cloned = JSON.parse(JSON.stringify(newElements));
-            setRedoStack([]); // Clear redo on typing
+            setRedoStack([]); 
             setHistory((prevHistory) => [...prevHistory, cloned]);
 
             return newElements;
         });
+    };
+    const handleToggleStroke = () => {
+        if (isTextSelected && selectedId) {
+            const newEnabled = !isStrokeEnabled;
+            setIsStrokeEnabled(newEnabled);
+
+            handleUpdateElement(selectedId, {
+                stroke: newEnabled ? strokeColor : null,
+                strokeWidth: newEnabled ? 2 : 0,
+            });
+        }
+    };
+
+    const handleStrokeColorChange = (color) => {
+        setStrokeColor(color);
+
+        if (isTextSelected && selectedId && isStrokeEnabled) {
+            handleUpdateElement(selectedId, {
+                stroke: color,
+            });
+        }
     };
 
     const handleUpdateElement = (id, updates) => {
@@ -188,30 +222,37 @@ const CreateBoard = () => {
 
     const handleDelete = () => {
         if (!selectedId) return;
+        
+        
+        setSelectedId(null);
+        
         setElements((prev) => {
             const newElements = prev.filter((el) => el.id !== selectedId);
             pushToHistory(newElements);
             return newElements;
         });
-        setSelectedId(null);
     };
 
     const handleUndo = () => {
         if (history.length === 0) return;
+        setSelectedId(null);
+        
         const previous = history[history.length - 1];
         setRedoStack((prev) => [...prev, elements]);
         setHistory((prev) => prev.slice(0, -1));
         setElements(previous);
-        setSelectedId(null);
     };
 
     const handleRedo = () => {
         if (redoStack.length === 0) return;
+        
+       
+        setSelectedId(null);
+        
         const next = redoStack[redoStack.length - 1];
         setRedoStack((prev) => prev.slice(0, -1));
         setHistory((prev) => [...prev, elements]);
         setElements(next);
-        setSelectedId(null);
     };
 
     const handleDeleteBoard = () => {
@@ -342,6 +383,30 @@ const CreateBoard = () => {
         setExporting(false);
     };
 
+    const handleFormatChange = (property, value) => {
+        if (isTextSelected && selectedId) {
+            handleUpdateElement(selectedId, {
+                [property]: value,
+            });
+
+           
+            if (property === 'fontWeight') setFontWeight(value);
+            if (property === 'fontStyle') setFontStyle(value);
+            if (property === 'textDecoration') setTextDecoration(value);
+        }
+    };
+
+
+
+    
+    useEffect(() => {
+        if (isTextSelected && selectedElement) {
+            setFontWeight(selectedElement.fontWeight || "normal");
+            setFontStyle(selectedElement.fontStyle || "normal");
+            setTextDecoration(selectedElement.textDecoration || "none");
+        }
+    }, [selectedId, isTextSelected, selectedElement]);
+
     if (loading) {
         return (
             <div className="loading-container">
@@ -461,8 +526,18 @@ const CreateBoard = () => {
                                     x={element.x}
                                     y={element.y}
                                     fontFamily={element.fontFamily}
+                                    color={element.color}
+                                    stroke={element.stroke || null}
+                                    strokeWidth={
+                                        element.stroke
+                                            ? element.strokeWidth || 2
+                                            : 0
+                                    }
                                     fontSize={element.fontSize || 20}
                                     rotation={element.rotation}
+                                    fontWeight={element.fontWeight || "normal"}
+                                    fontStyle={element.fontStyle || "normal"}
+                                    textDecoration={element.textDecoration || "none"}
                                     onChange={handleTextChange}
                                     onUpdate={handleUpdateElement}
                                     isSelected={isSelected}
@@ -493,7 +568,7 @@ const CreateBoard = () => {
                 </Layer>
             </Stage>
             {selectedId && (
-                <FloatingToolbar
+                <ToolbarWrapper
                     onMoveUp={() => moveLayer("up")}
                     onMoveDown={() => moveLayer("down")}
                     onDelete={handleDelete}
@@ -510,6 +585,26 @@ const CreateBoard = () => {
                             });
                         }
                     }}
+                    selectedColour={
+                        isTextSelected
+                            ? selectedElement?.color || "#000000"
+                            : "#000000"
+                    }
+                    onColourChange={(newColor) => {
+                        if (isTextSelected && selectedId) {
+                            handleUpdateElement(selectedId, {
+                                color: newColor,
+                            });
+                        }
+                    }}
+                    isStrokeEnabled={isStrokeEnabled}
+                    onToggleStroke={handleToggleStroke}
+                    strokeColor={strokeColor}
+                    onStrokeColorChange={handleStrokeColorChange}
+                    fontWeight={fontWeight}
+                    fontStyle={fontStyle}
+                    textDecoration={textDecoration}
+                    onFormatChange={handleFormatChange}
                 />
             )}
         </div>
