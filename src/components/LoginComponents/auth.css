@@ -119,3 +119,28 @@ body {
     padding: 30px;
   }
 }
+
+.link-container {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.link-container p {
+  margin-bottom: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.create-profile-link {
+  display: inline-block;
+  color: #007bff;
+  text-decoration: none;
+  padding: 0.25rem 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.create-profile-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+  color: #0056b3;
+}
