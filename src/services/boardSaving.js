@@ -11,7 +11,13 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase";
 
-export const saveBoard = async ({ elements, user, date, public: isPublic }) => {
+export const saveBoard = async ({
+    elements,
+    user,
+    date,
+    public: isPublic,
+    previewImage,
+}) => {
     if (!user) throw new Error("User not logged in");
 
     const docId = `${user.uid}_${date}`;
@@ -23,6 +29,7 @@ export const saveBoard = async ({ elements, user, date, public: isPublic }) => {
         date,
         updatedAt: serverTimestamp(),
         public: isPublic,
+        previewImage: previewImage,
     };
 
     await setDoc(boardRef, boardData);
@@ -72,4 +79,28 @@ export const getPublicBoards = async () => {
         ...doc.data(),
     }));
     return allPublicBoardsArr;
+};
+
+export const fetchUserBoards = async (userId) => {
+    if (!userId) throw new Error("User ID is required");
+
+    try {
+        const q = query(
+            collection(db, "boards"),
+            where("userId", "==", userId)
+        );
+        const querySnapshot = await getDocs(q);
+        const userBoards = [];
+
+        querySnapshot.forEach((doc) => {
+            userBoards.push({ id: doc.id, ...doc.data() });
+        });
+
+        userBoards.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        return userBoards;
+    } catch (error) {
+        console.error("Error fetching user boards:", error);
+        throw error;
+    }
 };

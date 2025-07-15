@@ -1,0 +1,223 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap");
+
+.profile {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 30px;
+    font-family: "Inter", sans-serif;
+    background: rgb(255, 255, 255);
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgb(224, 213, 217);
+}
+
+.profile h1 {
+    text-align: center;
+    font-family: "Inter", sans-serif;
+    color: rgb(154, 78, 110);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.profile label {
+    display: block;
+    margin: 15px 0 8px 0;
+    font-weight: 500;
+    color: rgb(60, 60, 60);
+}
+
+.profile input[type="text"],
+.profile input[type="url"],
+.profile input[type="email"] {
+    width: 100%;
+    padding: 12px 16px;
+    margin-top: 5px;
+    border: 1px solid rgb(224, 213, 217);
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    background-color: rgb(255, 255, 255);
+    color: rgb(60, 60, 60);
+}
+
+.profile input:focus {
+    border-color: rgb(176, 125, 142);
+    outline: none;
+}
+
+.profile button {
+    margin-top: 25px;
+    width: 100%;
+    padding: 14px;
+    background-color: rgb(240, 227, 232);
+    border: 2px solid white;
+    color: rgb(150, 55, 93);
+    font-weight: 500;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.profile button:hover {
+    background-color: rgb(176, 125, 142);
+}
+
+.profile button:disabled {
+    background-color: rgb(176, 125, 142);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.profile img {
+    display: block;
+    margin: 20px auto;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border: 3px solid rgb(224, 213, 217);
+}
+
+.profile h2 {
+    margin: 25px 0 15px 0;
+    text-align: center;
+    color: rgb(154, 78, 110);
+    font-weight: 600;
+}
+
+.boards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 16px;
+}
+
+.board-tile {
+    height: 400px;
+    background: white;
+    border: 1px solid rgb(224, 213, 217);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.board-image {
+    height: 75%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.board-info {
+    height: 25%;
+    padding: 12px;
+    text-align: center;
+}
+
+.board-info p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: rgb(60, 60, 60);
+}
+
+.board-tile:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 8px rgba(154, 78, 110, 0.1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+.profile-page-container {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.profile-header {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+}
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+.edit-form {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.edit-form label {
+    font-weight: bold;
+    color: #555;
+    text-align: left;
+}
+
+.edit-form input[type="text"],
+.edit-form input[type="url"],
+.edit-form input[type="email"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.edit-form input[type="text"]:focus,
+.edit-form input[type="url"]:focus,
+.edit-form input[type="email"]:focus {
+    outline: none;
+    border-color: #14213d;
+}
+
+.edit-form button {
+    background-color: #14213d;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100%;
+}
+
+.edit-form button:hover {
+    background-color: #1a1a2e;
+}

@@ -1,0 +1,87 @@
+.calendar-container {
+  width: 100%;
+  padding: 0px;
+  margin-bottom: 60px;
+}
+
+.react-calendar {
+  width: 100%;
+  background: white;
+  border: 1px solid rgb(224, 213, 217);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(154, 78, 110, 0.08);
+  padding-bottom: 1rem;
+}
+
+.react-calendar__navigation {
+  display: flex;
+  height: 100px;
+  margin-bottom: 16px;
+
+  padding: 5px;
+}
+
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.8em;
+  color: rgb(154, 78, 110);
+  padding: 10px 0;
+}
+
+.react-calendar__month-view__days {
+  margin: 5px 10px;
+}
+
+.react-calendar__tile {
+  margin: 4px;
+  padding: 10px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid rgb(224, 213, 217);
+}
+
+.calendar-note-indicator {
+  font-size: 20px;
+  margin-top: 15px;
+  color: rgb(154, 78, 110);
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: rgb(154, 78, 110);
+  color: white;
+}
+
+.save-button {
+  background-color: rgb(154, 78, 110);
+  color: white;
+}
+
+.react-calendar__navigation button {
+  font-size: 13px;
+  color: rgb(154, 78, 110);
+  background: transparent;
+}
+
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  background-color: rgb(151, 83, 111);
+  color: white;
+}
+
+.react-calendar__tile--now {
+  background: rgb(248, 245, 242);
+  border: 2px solid rgb(154, 78, 110);
+}
+
+.react-calendar__tile--active {
+  background: rgb(176, 125, 142);
+  color: white;
+}
