@@ -1,0 +1,49 @@
+.post-card {
+    list-style: none;
+}
+.post-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.post-card-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.post-card-avatar-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #ccc;
+    color: white;
+    font-weight: bold;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.post-card-user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-card-username {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.post-card-date {
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #333;
+    margin: 12px 0;
+}
