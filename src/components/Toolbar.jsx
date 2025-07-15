@@ -8,17 +8,35 @@ import ImageUploader from "./ImageUploader";
 
 const Toolbar = ({
   onAddText,
-  onAddImage,
   onUndo,
   onRedo,
   onDelete,
   selectedId,
   onUploadError,
-  onOpenStickerLibrary,
   onUploadingComplete,
   onUploadingStart,
   onUploadingEnd,
+  onOpenStickerLibrary,
+  canUndo,
+  canRedo,
+  onBackgroundColorChange, // 👉 Added prop to trigger bg color change
 }) => {
+  // 👉 Helper to convert HEX (#RRGGBB) to { r, g, b }
+  const hexToRgb = (hex) => {
+    const sanitized = hex.replace("#", "");
+    const bigint = parseInt(sanitized, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return { r, g, b };
+  };
+
+  const handleColorChange = (e) => {
+    const hex = e.target.value;
+    const rgb = hexToRgb(hex); // 👉 Convert hex to RGB object
+    onBackgroundColorChange(rgb); // 👉 Update background color state in parent
+  };
+
   return (
     <div className="toolbar-container">
       <ul className="toolbar-list">
@@ -35,19 +53,43 @@ const Toolbar = ({
             onUploadingEnd={onUploadingEnd}
           />
         </li>
-
         <li>
           <button className="toolbar-button" onClick={onOpenStickerLibrary}>
             <RiEmojiStickerLine />
           </button>
         </li>
+        <li>
+          {/* 👉 New background color picker button */}
+          <input
+            type="color"
+            onChange={handleColorChange} // 👉 Updates RGB color state in parent
+            title="Pick background color"
+            className="toolbar-button"
+            style={{
+              width: "40px",
+              height: "40px",
+              padding: 0,
+              border: "none",
+              background: "none",
+              cursor: "pointer",
+            }}
+          />
+        </li>
       </ul>
 
       <div className="side-toolbar-container">
-        <button className="toolbar-button" onClick={onUndo}>
+        <button
+          className="toolbar-button"
+          onClick={onUndo}
+          disabled={!canUndo}
+        >
           <FaUndo />
         </button>
-        <button className="toolbar-button" onClick={onRedo}>
+        <button
+          className="toolbar-button"
+          onClick={onRedo}
+          disabled={!canRedo}
+        >
           <FaRedo />
         </button>
       </div>
