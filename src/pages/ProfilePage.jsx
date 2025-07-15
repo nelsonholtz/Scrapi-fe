@@ -5,140 +5,147 @@ import { useNavigate } from "react-router-dom";
 import { db } from "../services/firebase";
 import "./ProfilePage.css";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import AvatarUploader from "../components/LoginComponents/avatarAndCropping";
+import AvatarUploaderOld from "../components/LoginComponents/avatarAndCropping";
+import AvatarUploader from "../components/LoginComponents/AvatarUploader";
 
 const ProfilePage = () => {
-  const { user } = useUser();
-  const navigate = useNavigate();
+    const { user } = useUser();
+    const navigate = useNavigate();
 
-  const [userData, setUserData] = useState({
-    firstName: "",
-    lastName: "",
-    username: "",
-    avatarURL: "",
-    email: "",
-  });
-  const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
+    const [userData, setUserData] = useState({
+        firstName: "",
+        lastName: "",
+        username: "",
+        avatarURL: "",
+        email: "",
+    });
+    const [loading, setLoading] = useState(true);
+    const [updating, setUpdating] = useState(false);
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/");
-      return;
-    }
-
-    const docRef = doc(db, "users", user.uid);
-    getDoc(docRef)
-      .then((docSnap) => {
-        if (docSnap.exists()) {
-          setUserData(docSnap.data());
+    useEffect(() => {
+        if (!user) {
+            navigate("/");
+            return;
         }
-      })
-      .catch((error) => {
-        console.error("Error fetching user data:", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [user, navigate]);
 
-  const handleChange = (e) => {
-    setUserData({ ...userData, [e.target.name]: e.target.value });
-  };
+        const docRef = doc(db, "users", user.uid);
+        getDoc(docRef)
+            .then((docSnap) => {
+                if (docSnap.exists()) {
+                    setUserData(docSnap.data());
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching user data:", error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, [user, navigate]);
 
-  const handleAvatarUploadSuccess = (url) => {
-    setUserData((prev) => ({ ...prev, avatarURL: url }));
-    if (user) {
-      const docRef = doc(db, "users", user.uid);
-      updateDoc(docRef, { avatarURL: url }).catch((error) => {
-        console.error("Failed to update avatar URL in Firestore:", error);
-      });
-    }
-  };
+    const handleChange = (e) => {
+        setUserData({ ...userData, [e.target.name]: e.target.value });
+    };
 
-  const handleUpdate = () => {
-    if (!user) return;
-    setUpdating(true);
+    const handleAvatarUploadSuccess = (url) => {
+        setUserData((prev) => ({ ...prev, avatarURL: url }));
+        if (user) {
+            const docRef = doc(db, "users", user.uid);
+            updateDoc(docRef, { avatarURL: url }).catch((error) => {
+                console.error(
+                    "Failed to update avatar URL in Firestore:",
+                    error
+                );
+            });
+        }
+    };
 
-    const docRef = doc(db, "users", user.uid);
-    updateDoc(docRef, userData)
-      .then(() => {
-        alert("Profile updated successfully!");
-      })
-      .catch((error) => {
-        console.error("Error updating profile:", error);
-        alert("Failed to update profile.");
-      })
-      .finally(() => {
-        setUpdating(false);
-      });
-  };
+    const handleUpdate = () => {
+        if (!user) return;
+        setUpdating(true);
 
-  if (loading) return <p>Loading profile...</p>;
+        const docRef = doc(db, "users", user.uid);
+        updateDoc(docRef, userData)
+            .then(() => {
+                alert("Profile updated successfully!");
+            })
+            .catch((error) => {
+                console.error("Error updating profile:", error);
+                alert("Failed to update profile.");
+            })
+            .finally(() => {
+                setUpdating(false);
+            });
+    };
 
-  return (
-    <div className="profile">
-      <h1 className="script-text">Edit Your Profile</h1>
+    if (loading) return <p>Loading profile...</p>;
 
-      <label htmlFor="firstName">First Name</label>
-      <input
-        id="firstName"
-        name="firstName"
-        type="text"
-        value={userData.firstName}
-        onChange={handleChange}
-        required
-      />
+    return (
+        <div className="profile">
+            <h1 className="script-text">Edit Your Profile</h1>
 
-      <label htmlFor="lastName">Last Name</label>
-      <input
-        id="lastName"
-        name="lastName"
-        type="text"
-        value={userData.lastName}
-        onChange={handleChange}
-        required
-      />
+            <label htmlFor="firstName">First Name</label>
+            <input
+                id="firstName"
+                name="firstName"
+                type="text"
+                value={userData.firstName}
+                onChange={handleChange}
+                required
+            />
 
-      <label htmlFor="username">Username</label>
-      <input
-        id="username"
-        name="username"
-        type="text"
-        value={userData.username}
-        onChange={handleChange}
-        required
-      />
+            <label htmlFor="lastName">Last Name</label>
+            <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                value={userData.lastName}
+                onChange={handleChange}
+                required
+            />
 
-      <h4> Avatar</h4>
-      {userData.avatarURL && (
-        <img
-          src={userData.avatarURL}
-          alt="Avatar"
-          style={{
-            width: 100,
-            height: 100,
-            borderRadius: "50%",
-            marginBottom: 10,
-          }}
-        />
-      )}
+            <label htmlFor="username">Username</label>
+            <input
+                id="username"
+                name="username"
+                type="text"
+                value={userData.username}
+                onChange={handleChange}
+                required
+            />
 
-      <AvatarUploader user={user} onUploadSuccess={handleAvatarUploadSuccess} />
+            <h4> Avatar</h4>
+            {userData.avatarURL && (
+                <img
+                    src={userData.avatarURL}
+                    alt="Avatar"
+                    style={{
+                        width: 100,
+                        height: 100,
+                        borderRadius: "50%",
+                        marginBottom: 10,
+                    }}
+                />
+            )}
 
-      <label>Email</label>
-      <input type="email" value={userData.email} disabled />
+            <AvatarUploader
+                user={user}
+                onUploadSuccess={handleAvatarUploadSuccess}
+            />
 
-      <button onClick={handleUpdate} disabled={updating}>
-        {updating ? "Saving..." : "Save Changes"}
-      </button>
+            <label>Email</label>
+            <input type="email" value={userData.email} disabled />
 
-      <div style={{ marginTop: "30px" }}>
-        <h2>Your Calendar</h2>
-        <CalendarComponent user={user} />
-      </div>
-    </div>
-  );
+            <button onClick={handleUpdate} disabled={updating}>
+                {updating ? "Saving..." : "Save Changes"}
+            </button>
+
+            <div style={{ marginTop: "30px" }}>
+                <h2>Your Calendar</h2>
+                <CalendarComponent user={user} />
+            </div>
+        </div>
+    );
 };
 
 export default ProfilePage;
