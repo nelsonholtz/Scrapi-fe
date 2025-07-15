@@ -1,5 +1,9 @@
 import { useState, useContext } from "react";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 import { firebaseAuth } from "../../services/firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
@@ -10,7 +14,8 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-  const [Loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const navigate = useNavigate();
 
   const handleSignIn = (e) => {
@@ -26,9 +31,30 @@ const SignIn = () => {
         navigate("/create");
       })
       .catch((err) => {
-        const errorCode = err.code;
-        const errorMessage = "An error has happend during your sign in 👺";
-        console.log(errorCode, errorMessage);
+        setError("An error has happened during your sign in 👺");
+        setLoading(false);
+        console.log(err.code, err.message);
+      });
+  };
+
+  const handleResetPassword = () => {
+    if (!email) {
+      setError("Please enter your email first");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    sendPasswordResetEmail(firebaseAuth, email)
+      .then(() => {
+        setResetEmailSent(true);
+      })
+      .catch((err) => {
+        setError(err.message);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -43,24 +69,41 @@ const SignIn = () => {
             </button>
           </div>
         )}
+        {resetEmailSent && (
+          <div className="success-message">
+            Password reset email sent! Check your inbox.
+          </div>
+        )}
         <h1 className="script-text">Sign In</h1>
         <label>Email</label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
         <label>Password</label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
-        <button type="submit">Sign In</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Loading..." : "Sign In"}
+        </button>
 
         <div className="link-container">
           <Link to="/createprofile" className="create-profile-link">
             Create Profile
+          </Link>
+
+          <Link
+            to="/resetpassword"
+            className="reset-password-link"
+            onClick={handleResetPassword}
+          >
+            Forgot Password?
           </Link>
         </div>
       </form>
