@@ -1,0 +1,10 @@
+.create-profile-link {
+  display: block;
+  margin-top: 1rem;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.create-profile-link:hover {
+  text-decoration: underline;
+}
