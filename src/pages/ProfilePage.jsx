@@ -6,6 +6,8 @@ import { firebaseAuth, db } from "../services/firebase";
 import "../styles/ProfilePage.css";
 import "../styles/loading.css";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import AvatarUploaderOld from "../components/LoginComponents/avatarAndCropping";
+import AvatarUploader from "../components/LoginComponents/AvatarUploader";
 
 import AllUserBoards from "../components/AllUserBoards";
 const ProfilePage = () => {
@@ -52,10 +54,39 @@ const ProfilePage = () => {
         setUserData({ ...userData, [e.target.name]: e.target.value });
     };
 
+    const handleAvatarUploadSuccess = (url) => {
+        setUserData((prev) => ({ ...prev, avatarURL: url }));
+        if (user) {
+            const docRef = doc(db, "users", user.uid);
+            updateDoc(docRef, { avatarURL: url }).catch((error) => {
+                console.error(
+                    "Failed to update avatar URL in Firestore:",
+                    error
+                );
+            });
+        }
+    };
+
     const handleUpdate = () => {
         if (!user) return;
         setUpdating(true);
+        const handleUpdate = () => {
+            if (!user) return;
+            setUpdating(true);
 
+            const docRef = doc(db, "users", user.uid);
+            updateDoc(docRef, userData)
+                .then(() => {
+                    alert("Profile updated successfully!");
+                })
+                .catch((error) => {
+                    console.error("Error updating profile:", error);
+                    alert("Failed to update profile.");
+                })
+                .finally(() => {
+                    setUpdating(false);
+                });
+        };
         const docRef = doc(db, "users", user.uid);
         updateDoc(docRef, userData)
             .then(() => {
@@ -124,8 +155,9 @@ const ProfilePage = () => {
                                 onChange={handleChange}
                             />
 
-                            <label>Last Name</label>
+                            <label htmlFor="lastName">Last Name</label>
                             <input
+                                id="lastName"
                                 name="lastName"
                                 type="text"
                                 value={userData.lastName}
@@ -139,15 +171,27 @@ const ProfilePage = () => {
                                 value={userData.username}
                                 onChange={handleChange}
                             />
+                            <div className="avatar-section">
+                                <h4> Avatar</h4>
+                                {userData.avatarURL && (
+                                    <img
+                                        src={userData.avatarURL}
+                                        alt="Avatar"
+                                        style={{
+                                            width: 100,
+                                            height: 100,
+                                            borderRadius: "50%",
+                                            marginBottom: 10,
+                                            objectFit: "cover",
+                                        }}
+                                    />
+                                )}
 
-                            <label>Avatar URL</label>
-                            <input
-                                name="avatarURL"
-                                type="url"
-                                value={userData.avatarURL}
-                                onChange={handleChange}
-                            />
-
+                                <AvatarUploader
+                                    user={user}
+                                    onUploadSuccess={handleAvatarUploadSuccess}
+                                />
+                            </div>
                             <label>Email</label>
                             <input
                                 type="email"
@@ -175,5 +219,4 @@ const ProfilePage = () => {
         </>
     );
 };
-
 export default ProfilePage;
