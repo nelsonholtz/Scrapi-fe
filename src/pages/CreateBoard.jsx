@@ -553,13 +553,19 @@ const CreateBoard = () => {
         height={window.innerHeight}
         onMouseDown={(e) => {
           const clickedOn = e.target;
-          if (
+
+          if (isDrawingMode) {
+            handleDrawingMouseDown(e);
+          } else if (
             clickedOn === clickedOn.getStage() ||
             clickedOn.name() === "background"
           ) {
             setSelectedId(null);
           }
         }}
+        ref={stageRef}
+        onMouseMove={handleDrawingMouseMove}
+        onMouseUp={handleDrawingMouseUp}
       >
         <Layer>
           {/* 👉 Background layer rendered behind everything */}
@@ -572,10 +578,6 @@ const CreateBoard = () => {
             fill={`rgb(${backgroundColor.r},${backgroundColor.g},${backgroundColor.b})`}
           />
         </Layer>
-        ref={stageRef}
-        onMouseDown={handleDrawingMouseDown}
-        onMouseMove={handleDrawingMouseMove}
-        onMouseUp={handleDrawingMouseUp}>
         <Layer>
           {elements.map((element) => {
             if (element.type === "drawing") {
