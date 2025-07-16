@@ -47,7 +47,7 @@ const Toolbar = ({
     { name: "Jungle", url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e" },
     { name: "Outer Space", url: "https://images.unsplash.com/photo-1470472304068-4398a9daabf8" },
     { name: "Sky", url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb" },
-    { name: "Beach", url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e" },
+    { name: "Beach", url: "" },
   ];
 
   return (

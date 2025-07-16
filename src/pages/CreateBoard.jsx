@@ -17,6 +17,7 @@ import DatePicker from "../components/DatePicker";
 import FloatingToolbar from "../components/FloatingToolbar";
 import ToolbarWrapper from "../components/ToolbarWrapper";
 import StickerLibrary from "../components/StickerLibrary";
+import Loading from "../components/Loading";
 
 import "../components/toolBar.css";
 import "../styles/errorMessage.css";
@@ -45,24 +46,32 @@ const CreateBoard = () => {
   const [backgroundColor, setBackgroundColor] = useState({ r: 255, g: 255, b: 255 });
   const [backgroundImage, setBackgroundImage] = useState(null); // 👉 new
   const [loading, setLoading] = useState(false);
+
   const { datePath } = useParams();
   const initialDate = datePath || today;
   const [date, setDate] = useState(initialDate);
+
   const [selectedId, setSelectedId] = useState(null);
   const [error, setError] = useState(null);
+  const [selectedFont, setSelectedFont] = useState("Arial");
+
   const [saving, setSaving] = useState(false);
+
   const [exporting, setExporting] = useState(false);
   const [uploading, setUploading] = useState(false);
+
   const [history, setHistory] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
   const [isPublic, setIsPublic] = useState(false);
-  const [showStickerLibrary, setShowStickerLibrary] = useState(false); // 👉 toggle
+  const [showStickerLibrary, setShowStickerLibrary] = useState(false);
   const [isStrokeEnabled, setIsStrokeEnabled] = useState(false);
   const [strokeColor, setStrokeColor] = useState("#ffffff");
+
   const [fontWeight, setFontWeight] = useState("normal");
   const [fontStyle, setFontStyle] = useState("normal");
   const [textDecoration, setTextDecoration] = useState("none");
-  const [selectedFont, setSelectedFont] = useState("Arial");
+
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
 
   const stageRef = useRef();
   const { user } = useUser();
@@ -74,14 +83,56 @@ const CreateBoard = () => {
 
   useEffect(() => {
     latestDataRef.current = { elements, isPublic, user, date };
-    localStorage.setItem(`scrapi-${user?.uid}-${date}`, JSON.stringify({ elements, isPublic }));
+
+    localStorage.setItem(
+      `scrapi-${user?.uid}-${date}`,
+      JSON.stringify({ elements, isPublic })
+    );
+
     return () => {
       const { elements, isPublic, user, date } = latestDataRef.current;
+
       if (elements?.length > 0) {
-        updateBoardWithoutPreview({ elements, user, date, public: isPublic });
+        updateBoardWithoutPreview({
+          elements,
+          user,
+          date,
+          public: isPublic,
+        });
       }
     };
   }, [elements, isPublic, user, date]);
+
+  useEffect(() => {
+    if (user && date) {
+      setLoading(true);
+      getUserBoard(user.uid, date)
+        .then((board) => {
+          if (board) {
+            setElements(board.elements || []);
+            setIsPublic(!!board.public);
+          } else {
+            setElements([]);
+            setIsPublic(false);
+          }
+        })
+        .catch((err) => {
+          setError(err);
+          console.error("Failed to load board", err);
+          const cached = localStorage.getItem(`scrapi-${user?.uid}-${date}`);
+          if (cached) {
+            const { elements, isPublic } = JSON.parse(cached);
+            setElements(elements || []);
+            setIsPublic(isPublic || false);
+          } else {
+            setElements([]);
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [user, date]);
 
   const pushToHistory = useCallback((newElements) => {
     const clone = JSON.parse(JSON.stringify(newElements));
@@ -89,78 +140,342 @@ const CreateBoard = () => {
     setRedoStack([]);
   }, []);
 
-  useEffect(() => {
-    if (user && date) {
-      setLoading(true);
-      getUserBoard(user.uid, date)
-        .then((board) => {
-          const loadedElements = board?.elements || [];
-          setElements(loadedElements);
-          setIsPublic(!!board?.public);
-          pushToHistory(loadedElements); // 👉 push initial state
-        })
-        .catch((err) => {
-          setError(err);
-          const cached = localStorage.getItem(`scrapi-${user?.uid}-${date}`);
-          if (cached) {
-            const { elements, isPublic } = JSON.parse(cached);
-            setElements(elements || []);
-            setIsPublic(isPublic || false);
-            pushToHistory(elements || []); // 👉 push cached too
-          } else {
-            setElements([]);
-            pushToHistory([]); // 👉 empty
-          }
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [user, date, pushToHistory]);
+  const handleAddElement = useCallback(
+    (elementType, elementData) => {
+      const newElement = {
+        id: uuidv4(),
+        type: elementType,
+        ...elementData,
+        x: 200,
+        y: 200,
+        text: elementData?.text || "text",
+        fontSize: 20,
+        ...(elementType === "text" && {
+          fontWeight: "normal",
+          fontStyle: "normal",
+          textDecoration: "none",
+        }),
+      };
+      setElements((prev) => {
+        const newElements = [...prev, newElement];
+        pushToHistory(newElements);
+        return newElements;
+      });
+    },
+    [pushToHistory]
+  );
 
-  const handleUndo = () => {
-    if (history.length === 0) return;
-    const previous = history[history.length - 1];
-    setRedoStack((prev) => [...prev, elements]);
-    setHistory((prev) => prev.slice(0, -1));
-    setElements(previous);
-    setSelectedId(null);
+  const handleAddImageElement = useCallback(
+    (imageUrl) => {
+      try {
+        const newImageElement = {
+          id: uuidv4(),
+          type: "image",
+          src: imageUrl,
+          x: 200,
+          y: 200,
+          scaleX: 1,
+          scaleY: 1,
+          rotation: 0,
+        };
+        setElements((prev) => {
+          const newElements = [...prev, newImageElement];
+          pushToHistory(newElements);
+          return newElements;
+        });
+      } catch (err) {
+        setError("This image is hiding, please try again");
+        console.error("This image has been lost in the scrapbook", err);
+      }
+    },
+    [pushToHistory]
+  );
+
+  const handleTextChange = (id, newText) => {
+    setElements((prev) => {
+      const newElements = prev.map((el) =>
+        el.id === id ? { ...el, text: newText } : el
+      );
+
+      const cloned = JSON.parse(JSON.stringify(newElements));
+      setRedoStack([]);
+      setHistory((prevHistory) => [...prevHistory, cloned]);
+
+      return newElements;
+    });
+  };
+  const handleToggleStroke = () => {
+    if (isTextSelected && selectedId) {
+      const newEnabled = !isStrokeEnabled;
+      setIsStrokeEnabled(newEnabled);
+
+      handleUpdateElement(selectedId, {
+        stroke: newEnabled ? strokeColor : null,
+        strokeWidth: newEnabled ? 2 : 0,
+      });
+    }
+  };
+
+  const handleStrokeColorChange = (color) => {
+    setStrokeColor(color);
+
+    if (isTextSelected && selectedId && isStrokeEnabled) {
+      handleUpdateElement(selectedId, {
+        stroke: color,
+      });
+    }
+  };
+
+  const handleUpdateElement = (id, updates) => {
+    setElements((prev) => {
+      const newElements = prev.map((el) =>
+        el.id === id ? { ...el, ...updates } : el
+      );
+      pushToHistory(newElements);
+      return newElements;
+    });
   };
 
   const handleDelete = () => {
     if (!selectedId) return;
+
+    setSelectedId(null);
+
     setElements((prev) => {
-      const next = prev.filter((el) => el.id !== selectedId);
-      pushToHistory(next); // 👉 even if next is empty
-      return next;
+      const newElements = prev.filter((el) => el.id !== selectedId);
+      pushToHistory(newElements);
+      return newElements;
     });
+  };
+
+  const handleUndo = () => {
+    if (history.length === 0) return;
+    setSelectedId(null);
+
+    const previous = history[history.length - 1];
+    setRedoStack((prev) => [...prev, elements]);
+    setHistory((prev) => prev.slice(0, -1));
+    setElements(previous);
+  };
+
+  const handleRedo = () => {
+    if (redoStack.length === 0) return;
+    const next = redoStack[redoStack.length - 1];
+    setRedoStack((prev) => prev.slice(0, -1));
+    setHistory((prev) => [...prev, elements]);
+    setElements(next);
     setSelectedId(null);
   };
 
-  const handleAddElement = useCallback((type, data) => {
-    const newElement = {
-      id: uuidv4(),
-      type,
-      ...data,
-      x: 200,
-      y: 200,
-      text: data?.text || "text",
-      fontSize: 20,
-      fontWeight: "normal",
-      fontStyle: "normal",
-      textDecoration: "none",
-    };
-    setElements((prev) => {
-      const next = [...prev, newElement];
-      pushToHistory(next);
-      return next;
-    });
-  }, [pushToHistory]);
-
-  const handleOpenStickerLibrary = (value) => {
-    setShowStickerLibrary(value); // 👉 fix toggle
+  const handleDeleteBoard = () => {
+    setDeleteConfirmation(true);
   };
+
+  const handleConfirmDelete = () => {
+    setElements([]);
+    setHistory([]);
+    setRedoStack([]);
+    setSelectedId(null);
+    setDeleteConfirmation(false);
+  };
+
+  const moveLayer = (direction) => {
+    setElements((prev) => {
+      const index = prev.findIndex((element) => element.id === selectedId);
+      if (index < 0) return prev;
+
+      const newIndex = direction === "up" ? index + 1 : index - 1;
+      if (newIndex < 0 || newIndex >= prev.length) return prev;
+
+      const newElements = [...prev];
+      const [movedElement] = newElements.splice(index, 1);
+      newElements.splice(newIndex, 0, movedElement);
+
+      pushToHistory(newElements);
+      return newElements;
+    });
+  };
+
+  const handleSaveBoard = async () => {
+    console.log("handleSaveBoard triggered");
+
+    if (!user) {
+      console.log("User not logged in, not saved");
+      return;
+    }
+
+    if (!elements.length) {
+      setError("Why don't you add something before saving 😏");
+      return;
+    }
+
+    if (!stageRef.current) {
+      console.error("stageRef.current is null or undefined");
+      setError("Something went wrong please try again.");
+      return;
+    }
+    console.log("stageRef.current is available");
+
+    setSaving(true);
+
+    try {
+      // Get base64 image string
+      const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
+
+      // Convert base64 string to a Blob to upload to cloudinary
+      function dataURLtoBlob(dataurl) {
+        const arr = dataurl.split(",");
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], { type: mime });
+      }
+
+      const blob = dataURLtoBlob(dataURL);
+
+      const formData = new FormData();
+      formData.append("file", blob);
+      formData.append("upload_preset", UPLOAD_PRESET);
+
+      console.log("Uploading preview image to Cloudinary...");
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+      console.log("Cloudinary upload response:", data);
+
+      if (!res.ok) {
+        throw new Error(data.error?.message || "Cloudinary upload failed");
+      }
+
+      console.log("Preview image URL received:", data.secure_url);
+
+      await saveBoard({
+        elements,
+        user,
+        date,
+        public: isPublic,
+        previewImage: data.secure_url,
+      });
+
+      console.log("Board saved successfully with previewImage!");
+    } catch (error) {
+      console.error("Error in handleSaveBoard:", error);
+      setError("Failed to save board. Try again?");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const exportToImage = () => {
+    setExporting(true);
+
+    const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
+
+    const link = document.createElement("a");
+    link.download = "scrapi-board-export.png";
+    link.href = dataURL;
+    link.click();
+
+    setExporting(false);
+  };
+
+  const handleFormatChange = (property, value) => {
+    if (isTextSelected && selectedId) {
+      handleUpdateElement(selectedId, {
+        [property]: value,
+      });
+
+      if (property === "fontWeight") setFontWeight(value);
+      if (property === "fontStyle") setFontStyle(value);
+      if (property === "textDecoration") setTextDecoration(value);
+    }
+  };
+
+  useEffect(() => {
+    if (isTextSelected && selectedElement) {
+      setFontWeight(selectedElement.fontWeight || "normal");
+      setFontStyle(selectedElement.fontStyle || "normal");
+      setTextDecoration(selectedElement.textDecoration || "none");
+    }
+  }, [selectedId, isTextSelected, selectedElement]);
+
+  if (loading) {
+    return <Loading state={"loading"} />;
+  }
+
+  if (saving) {
+    return <Loading state={"saving"} />;
+  }
+
+  if (exporting) {
+    return <Loading state={"exporting"} />;
+  }
+
+  if (uploading) {
+    return <Loading state={"uploading"} />;
+  }
+  if (error)
+    return (
+      <div className="error-container">
+        <button className="close-btn" onClick={() => setError(null)}>
+          ×
+        </button>
+        <div className="error-whale">🐳</div>
+        <p className="error-text">{error}</p>
+      </div>
+    );
+
+  if (deleteConfirmation)
+    return (
+      <div className="error-container">
+        <button
+          className="close-btn"
+          onClick={() => setDeleteConfirmation(false)}
+        >
+          ×
+        </button>
+        <div className="error-whale">🗑️</div>
+        <p className="error-text">
+          Are you sure you want to delete the board? This cannot be undone.
+        </p>
+        <div className="confirm-buttons">
+          <button className="confirm-btn" onClick={handleConfirmDelete}>
+            Yes, delete
+          </button>
+          <button
+            className="confirm-btn"
+            onClick={() => setDeleteConfirmation(false)}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
 
   return (
     <div className="create-board-page">
+      <label className="toggle-container">
+        Make public:
+        <input
+          type="checkbox"
+          checked={isPublic}
+          onChange={(e) => setIsPublic(e.target.checked)}
+          className="toggle-checkbox"
+        />
+        <span className="toggle-slider"></span>
+      </label>
+      <DatePicker date={date} onDateChange={setDate} />
+
       <Toolbar
         onAddText={() => handleAddElement("text", { text: "New Text" })}
         onUploadingComplete={(url) => handleAddElement("image", { src: url })}
@@ -175,7 +490,7 @@ const CreateBoard = () => {
         }}
         onDelete={handleDelete}
         selectedId={selectedId}
-        onOpenStickerLibrary={handleOpenStickerLibrary}
+        onOpenStickerLibrary={() => setShowStickerLibrary(true)}
         onSave={() => {}}
         onExport={() => {}}
         onDeleteBoard={() => {
@@ -189,6 +504,8 @@ const CreateBoard = () => {
         canRedo={redoStack.length > 0}
         onBackgroundColorChange={setBackgroundColor}
         onBackgroundImageChange={setBackgroundImage}
+        onUploadingStart={() => setUploading(true)}
+        onUploadingEnd={() => setUploading(false)}
       />
 
       <StickerLibrary
@@ -202,21 +519,25 @@ const CreateBoard = () => {
         width={window.innerWidth}
         height={window.innerHeight}
         onMouseDown={(e) => {
-          if (e.target === e.target.getStage()) setSelectedId(null);
+          const clickedOn = e.target;
+          if (
+            clickedOn === clickedOn.getStage() ||
+            clickedOn.name() === "background"
+          ) {
+            setSelectedId(null);
+          }
         }}
       >
         <Layer>
-          {backgroundImage ? (
-            <BackgroundImage src={backgroundImage} />
-          ) : (
-            <Rect
-              x={0}
-              y={0}
-              width={window.innerWidth}
-              height={window.innerHeight}
-              fill={`rgb(${backgroundColor.r},${backgroundColor.g},${backgroundColor.b})`}
-            />
-          )}
+          {/* 👉 Background layer rendered behind everything */}
+          <Rect
+            name="background"
+            x={0}
+            y={0}
+            width={window.innerWidth}
+            height={window.innerHeight}
+            fill={`rgb(${backgroundColor.r},${backgroundColor.g},${backgroundColor.b})`}
+          />
         </Layer>
 
         <Layer>
@@ -229,24 +550,19 @@ const CreateBoard = () => {
                   text={element.text}
                   x={element.x}
                   y={element.y}
-                  fontFamily={element.fontFamily || "Arial"}
-                  color={element.color || "#000000"}
+                  fontFamily={element.fontFamily}
+                  color={element.color}
+                  stroke={element.stroke || null}
+                  strokeWidth={element.stroke ? element.strokeWidth || 2 : 0}
                   fontSize={element.fontSize || 20}
-                  rotation={element.rotation || 0}
+                  rotation={element.rotation}
                   fontWeight={element.fontWeight || "normal"}
                   fontStyle={element.fontStyle || "normal"}
                   textDecoration={element.textDecoration || "none"}
-                  onChange={(id, text) => {
-                    setElements((prev) => prev.map((el) => el.id === id ? { ...el, text } : el));
-                  }}
-                  onUpdate={(id, updates) => {
-                    setElements((prev) => {
-                      const next = prev.map((el) => el.id === id ? { ...el, ...updates } : el);
-                      pushToHistory(next);
-                      return next;
-                    });
-                  }}
-                  isSelected={selectedId === element.id}
+                  width={element.width || 200}
+                  onChange={handleTextChange}
+                  onUpdate={handleUpdateElement}
+                  isSelected={isSelected}
                   onSelect={() => setSelectedId(element.id)}
                   stageRef={stageRef}
                 />
@@ -283,51 +599,34 @@ const CreateBoard = () => {
       {selectedId && (
         <FloatingToolbar
           isTextSelected={isTextSelected}
-          onMoveUp={() => {}}
-          onMoveDown={() => {}}
-          onDelete={handleDelete}
-          selectedFont={selectedElement?.fontFamily || "Arial"}
-          onFontChange={(font) => {
-            if (isTextSelected) {
-              setElements((prev) => prev.map((el) => el.id === selectedId ? { ...el, fontFamily: font } : el));
+          selectedFont={
+            isTextSelected ? selectedElement?.fontFamily || "Arial" : undefined
+          }
+          onFontChange={(newFont) => {
+            if (isTextSelected && selectedId) {
+              handleUpdateElement(selectedId, {
+                fontFamily: newFont,
+              });
             }
           }}
-          selectedColour={selectedElement?.color || "#000000"}
-          onColourChange={(color) => {
-            if (isTextSelected) {
-              setElements((prev) => prev.map((el) => el.id === selectedId ? { ...el, color } : el));
+          selectedColour={
+            isTextSelected ? selectedElement?.color || "#000000" : "#000000"
+          }
+          onColourChange={(newColor) => {
+            if (isTextSelected && selectedId) {
+              handleUpdateElement(selectedId, {
+                color: newColor,
+              });
             }
           }}
           isStrokeEnabled={isStrokeEnabled}
-          onToggleStroke={() => {
-            const newStroke = !isStrokeEnabled;
-            setIsStrokeEnabled(newStroke);
-            if (isTextSelected) {
-              setElements((prev) => prev.map((el) => el.id === selectedId ? {
-                ...el,
-                stroke: newStroke ? strokeColor : null,
-                strokeWidth: newStroke ? 2 : 0,
-              } : el));
-            }
-          }}
+          onToggleStroke={handleToggleStroke}
           strokeColor={strokeColor}
-          onStrokeColorChange={(color) => {
-            setStrokeColor(color);
-            if (isTextSelected && isStrokeEnabled) {
-              setElements((prev) => prev.map((el) => el.id === selectedId ? { ...el, stroke: color } : el));
-            }
-          }}
+          onStrokeColorChange={handleStrokeColorChange}
           fontWeight={fontWeight}
           fontStyle={fontStyle}
           textDecoration={textDecoration}
-          onFormatChange={(property, value) => {
-            if (isTextSelected) {
-              setElements((prev) => prev.map((el) => el.id === selectedId ? { ...el, [property]: value } : el));
-              if (property === "fontWeight") setFontWeight(value);
-              if (property === "fontStyle") setFontStyle(value);
-              if (property === "textDecoration") setTextDecoration(value);
-            }
-          }}
+          onFormatChange={handleFormatChange}
         />
       )}
     </div>
