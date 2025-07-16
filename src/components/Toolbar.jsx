@@ -11,39 +11,39 @@ import ImageUploader from "./ImageUploader";
 
 const Toolbar = ({
     onAddText,
-      onUndo,
+    onUndo,
     onRedo,
     onDelete,
     onDeleteBoard,
     selectedId,
     onUploadError,
-      onUploadingComplete,
+    onUploadingComplete,
     onUploadingStart,
     onUploadingEnd,
     onSave,
     onExport,
-  onOpenStickerLibrary,
-  canUndo,
-  canRedo,
-  onBackgroundColorChange, // 👉 Added prop to trigger bg color change
+    onOpenStickerLibrary,
+    canUndo,
+    canRedo,
+    onBackgroundColorChange, // 👉 Added prop to trigger bg color change
 }) => {
     // 👉 Helper to convert HEX (#RRGGBB) to { r, g, b }
-  const hexToRgb = (hex) => {
-    const sanitized = hex.replace("#", "");
-    const bigint = parseInt(sanitized, 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-    return { r, g, b };
-  };
+    const hexToRgb = (hex) => {
+        const sanitized = hex.replace("#", "");
+        const bigint = parseInt(sanitized, 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return { r, g, b };
+    };
 
-  const handleColorChange = (e) => {
-    const hex = e.target.value;
-    const rgb = hexToRgb(hex); // 👉 Convert hex to RGB object
-    onBackgroundColorChange(rgb); // 👉 Update background color state in parent
-  };
+    const handleColorChange = (e) => {
+        const hex = e.target.value;
+        const rgb = hexToRgb(hex); // 👉 Convert hex to RGB object
+        onBackgroundColorChange(rgb); // 👉 Update background color state in parent
+    };
 
-  return (
+    return (
         <div className="toolbar-container">
             <ul className="toolbar-list">
                 <li>
@@ -99,46 +99,40 @@ const Toolbar = ({
                         <RiDeleteBin2Line />
                     </button>
                 </li>
-              <li>
-          {/* 👉 New background color picker button */}
-          <input
-            type="color"
-            onChange={handleColorChange} // 👉 Updates RGB color state in parent
-            title="Pick background color"
-            className="toolbar-button"
-            style={{
-              width: "40px",
-              height: "40px",
-              padding: 0,
-              border: "none",
-              background: "none",
-              cursor: "pointer",
-            }}
-          />
-        </li>
-      </ul>
+                <li>
+                    {/* 👉 New background color picker button */}
+                    <input
+                        type="color"
+                        onChange={handleColorChange} // 👉 Updates RGB color state in parent
+                        title="Pick background color"
+                        className="toolbar-button"
+                        style={{
+                            width: "40px",
+                            height: "40px",
+                            padding: 0,
+                            border: "none",
+                            background: "none",
+                            cursor: "pointer",
+                        }}
+                    />
+                </li>
+            </ul>
 
             <div className="side-toolbar-container">
                 <button
                     title="Undo"
-                   
-          className="toolbar-button"
-                   
-          onClick={onUndo}
-                
-          disabled={!canUndo}
-        >
+                    className="toolbar-button"
+                    onClick={onUndo}
+                    disabled={!canUndo}
+                >
                     <FaUndo />
                 </button>
                 <button
                     title="Redo"
-                   
-          className="toolbar-button"
-                   
-          onClick={onRedo}
-                
-          disabled={!canRedo}
-        >
+                    className="toolbar-button"
+                    onClick={onRedo}
+                    disabled={!canRedo}
+                >
                     <FaRedo />
                 </button>
             </div>
