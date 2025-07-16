@@ -2,7 +2,7 @@ import { useState } from "react";
 import "../styles/PublicBoardsGrid.css";
 
 const PublicBoardGrid = ({ boards }) => {
-    const [sortBy, setSortBy] = useState("updatedAt"); // or "date"
+    const [sortBy, setSortBy] = useState("updatedAt");
 
     const sortedBoards = [...boards].sort((a, b) => {
         if (sortBy === "updatedAt") {
