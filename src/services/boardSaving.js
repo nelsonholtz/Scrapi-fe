@@ -51,7 +51,7 @@ export const updateBoardWithoutPreview = async ({
     // Check if document exists before trying to update
     const docSnap = await getDoc(boardRef);
     if (!docSnap.exists()) {
-        return; 
+        return;
     }
 
     await updateDoc(boardRef, {
@@ -145,4 +145,19 @@ export const deleteBoard = async (userId, date) => {
         console.error("Error deleting board:", error);
         throw error;
     }
+};
+export const fetchPublicBoards = async (userId) => {
+    const boardsRef = collection(db, "boards");
+    const q = query(
+        boardsRef,
+        where("userId", "==", userId),
+        where("public", "==", true)
+    );
+
+    const querySnapshot = await getDocs(q);
+    const boards = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+    }));
+    return boards;
 };
