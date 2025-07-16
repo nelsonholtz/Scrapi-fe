@@ -3,6 +3,7 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { firebaseAuth, db } from "../../services/firebase";
 import { useNavigate } from "react-router-dom";
+import AvatarUploader from "./AvatarUploader";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -13,14 +14,11 @@ const SignUp = () => {
   const [avatarURL, setAvatarURL] = useState("");
 
   const [emailError, setEmailError] = useState("");
-  const [avatarURLError, setAvatarURLError] = useState("");
 
   const navigate = useNavigate();
 
   const emailRegex =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  const urlRegex =
-    /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$/i;
 
   const handleEmailChange = (e) => {
     const value = e.target.value;
@@ -33,20 +31,13 @@ const SignUp = () => {
     }
   };
 
-  const handleAvatarURLChange = (e) => {
-    const value = e.target.value;
-    setAvatarURL(value);
-
-    if (value && !urlRegex.test(value)) {
-      setAvatarURLError("Please enter a valid URL.");
-    } else {
-      setAvatarURLError("");
-    }
+  const handleAvatarUploadSuccess = (url) => {
+    setAvatarURL(url);
   };
 
   const handleSignUp = (e) => {
     e.preventDefault();
-    if (emailError || avatarURLError) return;
+    if (emailError) return;
     console.log({
       firstName,
       lastName,
@@ -88,6 +79,7 @@ const SignUp = () => {
         }
       });
   };
+
   const getInputClass = (error, value) => {
     if (error) return "error";
     if (value && !error) return "success";
@@ -128,13 +120,28 @@ const SignUp = () => {
           onChange={(e) => setUsername(e.target.value)}
         />
 
-        <label htmlFor="avatarURL">Avatar URL</label>
-        <input
-          id="avatarURL"
-          type="url"
-          value={avatarURL}
-          onChange={(e) => setAvatarURL(e.target.value)}
-        />
+        <label htmlFor="avatar">Avatar (Optional)</label>
+        <div className="avatar-upload-section">
+          {avatarURL && avatarURL.trim() !== "" && (
+            <img
+              src={avatarURL}
+              alt="Avatar preview"
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: "50%",
+                marginBottom: 10,
+                objectFit: "cover",
+                display: "block",
+                margin: "0 auto 10px auto"
+              }}
+            />
+          )}
+          <AvatarUploader
+            user={{ uid: 'temp-signup-user' }}
+            onUploadSuccess={handleAvatarUploadSuccess}
+          />
+        </div>
         <label>Email</label>
         <input
           type="text"

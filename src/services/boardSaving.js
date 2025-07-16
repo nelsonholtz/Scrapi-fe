@@ -7,6 +7,7 @@ import {
     getDoc,
     setDoc,
     updateDoc,
+    deleteDoc,
     serverTimestamp,
     orderBy,
 } from "firebase/firestore";
@@ -46,6 +47,12 @@ export const updateBoardWithoutPreview = async ({
 
     const docId = `${user.uid}_${date}`;
     const boardRef = doc(db, "boards", docId);
+
+    // Check if document exists before trying to update
+    const docSnap = await getDoc(boardRef);
+    if (!docSnap.exists()) {
+        return; 
+    }
 
     await updateDoc(boardRef, {
         elements,
@@ -120,6 +127,22 @@ export const fetchUserBoards = async (userId) => {
         return userBoards;
     } catch (error) {
         console.error("Error fetching user boards:", error);
+        throw error;
+    }
+};
+
+export const deleteBoard = async (userId, date) => {
+    if (!userId) throw new Error("User ID is required");
+    if (!date) throw new Error("Date is required");
+
+    const docId = `${userId}_${date}`;
+    const boardRef = doc(db, "boards", docId);
+
+    try {
+        await deleteDoc(boardRef);
+        return true;
+    } catch (error) {
+        console.error("Error deleting board:", error);
         throw error;
     }
 };

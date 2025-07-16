@@ -63,7 +63,7 @@
 .floating-toolbar {
   position: fixed;
   left: 20px;
-  top: 50%;
+  top: 70%;
   transform: translateY(-50%);
 
   display: flex;
@@ -117,6 +117,54 @@
   color: #888;
   cursor: not-allowed;
 }
+
+
+.delete-loading {
+    font-size: 12px;
+}
+
+
+.formatting-group {
+    display: flex !important;
+    gap: 4px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 4px;
+    border: 1px solid #e9ecef;
+}
+
+.format-btn {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 6px !important;
+    font-size: 16px !important;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.format-btn:hover {
+    background: #e9ecef;
+    color: #000;
+}
+
+.format-btn.active {
+    background: #007bff;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.format-btn.active:hover {
+    background: #0056b3;
+}
+
+
 
 .floating-toolbar .delete-button {
   background-color: #e53935 !important;

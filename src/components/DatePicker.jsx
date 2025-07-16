@@ -4,6 +4,7 @@ const DatePicker = ({ date, onDateChange }) => {
         <div className="date-picker">
             <label htmlFor="boardDate">Select Date:</label>
             <input
+                title="Select a date"
                 type="date"
                 id="boardDate"
                 value={date}

@@ -10,24 +10,24 @@ import { RiDeleteBin2Line } from "react-icons/ri";
 import ImageUploader from "./ImageUploader";
 
 const Toolbar = ({
-  onAddText,
-  onUndo,
-  onRedo,
-  onDelete,
-  onDeleteBoard,
-  selectedId,
-  onUploadError,
-  onUploadingComplete,
-  onUploadingStart,
-  onUploadingEnd,
-  onSave,
-  onExport,
+    onAddText,
+      onUndo,
+    onRedo,
+    onDelete,
+    onDeleteBoard,
+    selectedId,
+    onUploadError,
+      onUploadingComplete,
+    onUploadingStart,
+    onUploadingEnd,
+    onSave,
+    onExport,
   onOpenStickerLibrary,
   canUndo,
   canRedo,
   onBackgroundColorChange, // 👉 Added prop to trigger bg color change
 }) => {
-  // 👉 Helper to convert HEX (#RRGGBB) to { r, g, b }
+    // 👉 Helper to convert HEX (#RRGGBB) to { r, g, b }
   const hexToRgb = (hex) => {
     const sanitized = hex.replace("#", "");
     const bigint = parseInt(sanitized, 16);
@@ -44,42 +44,62 @@ const Toolbar = ({
   };
 
   return (
-    <div className="toolbar-container">
-      <ul className="toolbar-list">
-        <li>
-          <button className="toolbar-button" onClick={onAddText}>
-            <BsTextareaT />
-          </button>
-        </li>
-        <li>
-          <ImageUploader
-            onUploadingComplete={onUploadingComplete}
-            onUploadError={onUploadError}
-            onUploadingStart={onUploadingStart}
-            onUploadingEnd={onUploadingEnd}
-          />
-        </li>
-        <li>
-          <button className="toolbar-button" onClick={onOpenStickerLibrary}>
-            <RiEmojiStickerLine />
-          </button>
-        </li>
-        <li>
-          <button className="toolbar-button" onClick={onSave}>
-            <FiSave />
-          </button>
-        </li>
-        <li>
-          <button className="toolbar-button" onClick={onExport}>
-            <CgExport />
-          </button>
-        </li>
-        <li>
-          <button className="toolbar-button" onClick={onDeleteBoard}>
-            <RiDeleteBin2Line />
-          </button>
-        </li>
-        <li>
+        <div className="toolbar-container">
+            <ul className="toolbar-list">
+                <li>
+                    <button
+                        title="Add text"
+                        className="toolbar-button"
+                        onClick={onAddText}
+                    >
+                        <BsTextareaT />
+                    </button>
+                </li>
+                <li>
+                    <ImageUploader
+                        onUploadingComplete={onUploadingComplete}
+                        onUploadError={onUploadError}
+                        onUploadingStart={onUploadingStart}
+                        onUploadingEnd={onUploadingEnd}
+                    />
+                </li>
+                <li>
+                    <button
+                        title="Add stickers"
+                        className="toolbar-button"
+                        onClick={onOpenStickerLibrary}
+                    >
+                        <RiEmojiStickerLine />
+                    </button>
+                </li>
+                <li>
+                    <button
+                        title="Save your board"
+                        className="toolbar-button"
+                        onClick={onSave}
+                    >
+                        <FiSave />
+                    </button>
+                </li>
+                <li>
+                    <button
+                        title="Save your board as a PNG file"
+                        className="toolbar-button"
+                        onClick={onExport}
+                    >
+                        <CgExport />
+                    </button>
+                </li>
+                <li>
+                    <button
+                        title="Clear board"
+                        className="toolbar-button"
+                        onClick={onDeleteBoard}
+                    >
+                        <RiDeleteBin2Line />
+                    </button>
+                </li>
+              <li>
           {/* 👉 New background color picker button */}
           <input
             type="color"
@@ -98,24 +118,32 @@ const Toolbar = ({
         </li>
       </ul>
 
-      <div className="side-toolbar-container">
-        <button
+            <div className="side-toolbar-container">
+                <button
+                    title="Undo"
+                   
           className="toolbar-button"
+                   
           onClick={onUndo}
+                
           disabled={!canUndo}
         >
-          <FaUndo />
-        </button>
-        <button
+                    <FaUndo />
+                </button>
+                <button
+                    title="Redo"
+                   
           className="toolbar-button"
+                   
           onClick={onRedo}
+                
           disabled={!canRedo}
         >
-          <FaRedo />
-        </button>
-      </div>
-    </div>
-  );
+                    <FaRedo />
+                </button>
+            </div>
+        </div>
+    );
 };
 
 export default Toolbar;
