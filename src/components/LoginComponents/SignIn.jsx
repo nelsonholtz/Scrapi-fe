@@ -31,7 +31,7 @@ const SignIn = () => {
         navigate("/create");
       })
       .catch((err) => {
-        setError("An error has happened during your sign in 👺");
+        setError("Please check your email address and password agian 👺");
         setLoading(false);
         console.log(err.code, err.message);
       });
