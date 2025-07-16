@@ -8,6 +8,8 @@ import "../styles/loading.css";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import AvatarUploaderOld from "../components/LoginComponents/avatarAndCropping";
 import AvatarUploader from "../components/LoginComponents/AvatarUploader";
+import LogOut from "../components/LoginComponents/LogOut";
+import Loading from "../components/Loading";
 
 import AllUserBoards from "../components/AllUserBoards";
 const ProfilePage = () => {
@@ -102,17 +104,7 @@ const ProfilePage = () => {
     };
 
     if (loading) {
-        return (
-            <div className="loading-container">
-                <div className="whale">🐋</div>
-                <div>loading page</div>
-                <div className="dots">
-                    <div className="dot"></div>
-                    <div className="dot"></div>
-                    <div className="dot"></div>
-                </div>
-            </div>
-        );
+        return <Loading state={"loading"} />;
     }
     if (error)
         return (
@@ -130,11 +122,15 @@ const ProfilePage = () => {
             <div className="profile-page-container">
                 <h1>Your Profile</h1>
                 <div className="profile-header">
-                    <img
-                        src={userData.avatarURL}
-                        alt="Avatar"
-                        className="avatar"
-                    />
+                    {userData.avatarURL && userData.avatarURL.trim() !== "" ? (
+                        <img
+                            src={userData.avatarURL}
+                            alt="Avatar"
+                            className="avatar"
+                        />
+                    ) : (
+                        <div className="avatar-placeholder">👤</div>
+                    )}
                     <strong>
                         <h2>
                             {userData.firstName} {userData.lastName}
@@ -173,19 +169,20 @@ const ProfilePage = () => {
                             />
                             <div className="avatar-section">
                                 <h4> Avatar</h4>
-                                {userData.avatarURL && (
-                                    <img
-                                        src={userData.avatarURL}
-                                        alt="Avatar"
-                                        style={{
-                                            width: 100,
-                                            height: 100,
-                                            borderRadius: "50%",
-                                            marginBottom: 10,
-                                            objectFit: "cover",
-                                        }}
-                                    />
-                                )}
+                                {userData.avatarURL &&
+                                    userData.avatarURL.trim() !== "" && (
+                                        <img
+                                            src={userData.avatarURL}
+                                            alt="Avatar"
+                                            style={{
+                                                width: 100,
+                                                height: 100,
+                                                borderRadius: "50%",
+                                                marginBottom: 10,
+                                                objectFit: "cover",
+                                            }}
+                                        />
+                                    )}
 
                                 <AvatarUploader
                                     user={user}
@@ -202,6 +199,8 @@ const ProfilePage = () => {
                             <button onClick={handleUpdate} disabled={updating}>
                                 {updating ? "Saving..." : "Save Changes"}
                             </button>
+
+                            <LogOut />
                         </div>
                     )}
                 </div>

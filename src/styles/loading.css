@@ -4,8 +4,9 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
+  font-family: "Patrick Hand";
   font-size: 24px;
-  color: #026494;
+  color: #944902;
   user-select: none;
 }
 
@@ -13,7 +14,9 @@
   font-size: 48px;
   margin-bottom: 10px;
 }
-
+.scissors {
+  width: 80px;
+}
 .dots {
   display: flex;
   gap: 5px;
@@ -23,7 +26,7 @@
 .dot {
   width: 12px;
   height: 12px;
-  background-color: #026494;
+  background-color: #944902;
   border-radius: 50%;
   animation: bounce 1.2s infinite ease-in-out;
 }

@@ -26,7 +26,7 @@ const PostCard = ({ board }) => {
 
     return (
         <li className="post-card">
-            <div>
+            <div className="post-card-content">
                 <div className="post-card-header">
                     {userData?.avatarURL ? (
                         <img
@@ -66,7 +66,7 @@ const PostCard = ({ board }) => {
                 )}
 
                 <div className="post-card-updated">
-                    Last updated: {formattedUpdatedAt}
+                    Last updated: {formattedUpdatedAt || "Just now"}
                 </div>
             </div>
         </li>

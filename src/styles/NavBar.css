@@ -1,41 +1,47 @@
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    background-color: #ffffff;
-    border-bottom: 2px solid #ff9900;
-    font-family: "Arial", sans-serif;
-    position: sticky;
-    top: 0;
-    z-index: 10;
+  display: flex;
+  background-image: url("../assets/torn-paper-1.svg");
+  height: 220px;
+  background-repeat: repeat-x;
+
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 2rem 2rem;
+  background-color: #ffffff00;
+
+  font-family: "Arial", sans-serif;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .logo {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #000000;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #000000;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: "Caveat";
 }
 
 .logo-icon {
-    height: 1.8rem;
-    width: auto;
-    display: inline-block;
-    vertical-align: middle;
+  height: 4rem;
+  width: auto;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .nav-links a {
-    margin-left: 1.5rem;
-    color: #444444;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1rem;
+  margin-left: 1.5rem;
+  color: #444444;
+  text-decoration: none;
+  font-family: "Patrick Hand";
+  font-weight: 600;
+  font-size: 2rem;
 }
 
 .nav-links a:hover {
-    color: #0077ff;
+  color: #be865b;
 }

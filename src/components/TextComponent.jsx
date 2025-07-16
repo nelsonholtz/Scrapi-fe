@@ -11,6 +11,9 @@ const TextComponent = forwardRef(
             rotation,
             id,
             fontFamily,
+            color,
+            stroke,
+            strokeWidth,
             onUpdate,
             onClick,
             isSelected,
@@ -25,6 +28,11 @@ const TextComponent = forwardRef(
                 y={y}
                 rotation={rotation}
                 fontFamily={fontFamily}
+                fill={color}
+                stroke={stroke}
+                strokeWidth={strokeWidth}
+                wrap="word"
+                width={width}
                 draggable
                 onDblClick={() => onDoubleClick?.({ id, x, y, text })}
                 onDragEnd={(e) => {
@@ -34,7 +42,6 @@ const TextComponent = forwardRef(
                     });
                 }}
                 onClick={onClick}
-                stroke={isSelected ? "blue" : undefined}
             />
         );
     }

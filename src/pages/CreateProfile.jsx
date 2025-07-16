@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
 import SignUp from "../components/LoginComponents/SignUp";
-import SignIn from "../components/LoginComponents/SignIn";
-import LogOut from "../components/LoginComponents/LogOut";
 import "../styles/loading.css";
 import "../styles/errorMessage.css";
 import Loading from "../components/Loading";
-import Welcome from "../components/Welcome";
 
 const Home = () => {
     const [loading, setLoading] = useState(true);
@@ -36,8 +33,7 @@ const Home = () => {
 
     return (
         <>
-            <Welcome />
-            <SignIn />
+            <SignUp />
         </>
     );
 };

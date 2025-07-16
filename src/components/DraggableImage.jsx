@@ -27,7 +27,7 @@ const DraggableImage = ({
   const history = useRef([{ x: 20, y: 20, scaleX: 1, scaleY: 1, rotation: 0 }]);
   const historyStep = useRef(0);
 
-  const [image] = useImage(src, "anonymous");
+  const [image] = useImage(src && src.trim() !== "" ? src : null, "anonymous");
 
   const imageRef = useRef();
   const transformerRef = useRef();
@@ -49,6 +49,11 @@ const DraggableImage = ({
       rotation: node.rotation(),
     });
   };
+
+  
+  if (!src || src.trim() === "") {
+    return null;
+  }
 
   return (
     <>
