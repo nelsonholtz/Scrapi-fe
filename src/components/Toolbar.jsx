@@ -39,8 +39,8 @@ const Toolbar = ({
 
   const handleColorChange = (e) => {
     const hex = e.target.value;
-    const rgb = hexToRgb(hex); // 👉 Convert hex to RGB object
-    onBackgroundColorChange(rgb); // 👉 Update background color state in parent
+    const rgb = hexToRgb(hex);
+    onBackgroundColorChange(rgb);
   };
 
   return (
@@ -100,10 +100,9 @@ const Toolbar = ({
           </button>
         </li>
         <li>
-          {/* 👉 New background color picker button */}
           <input
             type="color"
-            onChange={handleColorChange} // 👉 Updates RGB color state in parent
+            onChange={handleColorChange}
             title="Pick background color"
             className="toolbar-button"
             style={{

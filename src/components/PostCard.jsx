@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import "../styles/PostCard.css";
 
 const PostCard = ({ board }) => {
@@ -46,7 +47,12 @@ const PostCard = ({ board }) => {
                         </strong>
                         <br />
                         <span className="post-card-username">
-                            @{userData?.username || userId}
+                            <Link
+                                to={`/profiles/${userData?.username || userId}`}
+                                className="post-card-user-link"
+                            >
+                                @{userData?.username || userId}
+                            </Link>
                         </span>
                     </div>
                 </div>
