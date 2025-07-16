@@ -53,6 +53,30 @@ const Toolbar = ({
           </button>
         </li>
         <li>
+          <button
+            className={`toolbar-button ${isDrawingMode ? "active" : ""}`}
+            onClick={() => setIsDrawingMode(!isDrawingMode)}
+            title={isDrawingMode ? "Disable Drawing" : "Enable Drawing"}
+            aria-pressed={isDrawingMode}
+          >
+            <FaPaintBrush />
+          </button>
+
+          {isDrawingMode && (
+            <select
+              className="toolbar-select"
+              value={tool}
+              onChange={(e) => setTool(e.target.value)}
+              aria-label="Select drawing tool"
+              style={{ padding: "5px", borderRadius: "4px" }}
+            >
+              <option value="brush">Brush</option>
+              <option value="eraser">Eraser</option>
+            </select>
+          )}
+        </li>
+
+        <li>
           <button className="toolbar-button" onClick={onSave}>
             <FiSave />
           </button>
@@ -75,29 +99,7 @@ const Toolbar = ({
             alignItems: "center",
             gap: "10px",
           }}
-        >
-          <button
-            className={`toolbar-button ${isDrawingMode ? "active" : ""}`}
-            onClick={() => setIsDrawingMode(!isDrawingMode)}
-            title={isDrawingMode ? "Disable Drawing" : "Enable Drawing"}
-            aria-pressed={isDrawingMode}
-          >
-            <FaPaintBrush />
-          </button>
-
-          {isDrawingMode && (
-            <select
-              className="toolbar-select"
-              value={tool}
-              onChange={(e) => setTool(e.target.value)}
-              aria-label="Select drawing tool"
-              style={{ padding: "5px", borderRadius: "4px" }}
-            >
-              <option value="brush">Brush</option>
-              <option value="eraser">Eraser</option>
-            </select>
-          )}
-        </div>
+        ></div>
       </ul>
 
       <div className="side-toolbar-container">
