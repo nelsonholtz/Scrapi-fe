@@ -1,53 +1,53 @@
 .loading-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    height: 100vh;
-    font-family: "Patrick Hand";
-    font-size: 24px;
-    color: #944902;
-    user-select: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: "Patrick Hand";
+  font-size: 24px;
+  color: #944902;
+  user-select: none;
 }
 
 .whale {
-    font-size: 48px;
-    margin-bottom: 10px;
+  font-size: 48px;
+  margin-bottom: 10px;
 }
 .scissors {
-    width: 80px;
+  width: 80px;
 }
 .dots {
-    display: flex;
-    gap: 5px;
-    margin-top: 10px;
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
 }
 
 .dot {
-    width: 12px;
-    height: 12px;
-    background-color: #944902;
-    border-radius: 50%;
-    animation: bounce 1.2s infinite ease-in-out;
+  width: 12px;
+  height: 12px;
+  background-color: #944902;
+  border-radius: 50%;
+  animation: bounce 1.2s infinite ease-in-out;
 }
 
 .dot:nth-child(1) {
-    animation-delay: -0.3s;
+  animation-delay: -0.3s;
 }
 .dot:nth-child(2) {
-    animation-delay: -0.15s;
+  animation-delay: -0.15s;
 }
 .dot:nth-child(3) {
-    animation-delay: 0s;
+  animation-delay: 0s;
 }
 
 @keyframes bounce {
-    0%,
-    80%,
-    100% {
-        transform: scale(0);
-    }
-    40% {
-        transform: scale(1);
-    }
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
 }

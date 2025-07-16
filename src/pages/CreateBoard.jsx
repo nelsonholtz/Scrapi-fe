@@ -480,7 +480,9 @@ const CreateBoard = () => {
         onDeleteBoard={handleDeleteBoard}
         canUndo={history.length > 0}
         canRedo={redoStack.length > 0}
-        onBackgroundColorChange={setBackgroundColor} // 👉 Added
+        onBackgroundColorChange={setBackgroundColor} // 👉
+        onUploadingStart={() => setUploading(true)}
+        onUploadingEnd={() => setUploading(false)}
       />
 
       <StickerLibrary
