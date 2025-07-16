@@ -5,6 +5,7 @@ import { db } from "../services/firebase";
 import PostCard from "../components/PostCard";
 import "../styles/exploreBoard.css";
 import "../styles/loading.css";
+import Loading from "../components/Loading";
 
 const ExplorePage = () => {
     const [publicBoards, setPublicBoards] = useState([]);
@@ -40,17 +41,7 @@ const ExplorePage = () => {
     }, []);
 
     if (loading) {
-        return (
-            <div className="loading-container">
-                <div className="whale">🐋</div>
-                <div>loading page</div>
-                <div className="dots">
-                    <div className="dot"></div>
-                    <div className="dot"></div>
-                    <div className="dot"></div>
-                </div>
-            </div>
-        );
+        return <Loading state={"loading"} />;
     }
     if (error)
         return (

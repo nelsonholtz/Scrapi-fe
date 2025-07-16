@@ -1,10 +1,177 @@
 .create-profile-link {
-  display: block;
-  margin-top: 1rem;
-  color: #007bff;
-  text-decoration: none;
+    display: block;
+    margin-top: 1rem;
+    color: #007bff;
+    text-decoration: none;
 }
 
 .create-profile-link:hover {
-  text-decoration: underline;
+    text-decoration: underline;
+}
+.welcome {
+    position: relative;
+    text-align: center;
+    font-family: "Patrick Hand", cursive;
+    font-size: larger;
+    margin-bottom: 2rem;
+    color: #944902;
+    animation: fadeIn 1s ease-in;
+}
+.scrapi-logo {
+    height: 5rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes stop-motion-bounce {
+    0% {
+        transform: translateY(0px);
+    }
+    25% {
+        transform: translateY(-4px) rotate(-2deg);
+    }
+    50% {
+        transform: translateY(2px) rotate(2deg);
+    }
+    75% {
+        transform: translateY(-3px) rotate(-1deg);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.stop-motion {
+    animation: stop-motion-bounce 1s steps(1) infinite;
+}
+.sticker {
+    width: 150px;
+    position: absolute;
+    top: -30%;
+    left: 35%;
+    transform: translateX(0) rotate(-25deg);
+    opacity: 1;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.sticker.slide-in {
+    animation: stop-motion-slide 1.2s steps(6) forwards;
+}
+
+.sticker.idle {
+    animation: sticker-idle 1.2s steps(6) infinite;
+    opacity: 1;
+}
+
+@keyframes stop-motion-slide {
+    0% {
+        transform: translateX(-200px) rotate(-25deg);
+        opacity: 0;
+    }
+    20% {
+        transform: translateX(-150px) rotate(-23deg);
+        opacity: 1;
+    }
+    40% {
+        transform: translateX(-100px) rotate(-28deg);
+    }
+    60% {
+        transform: translateX(-50px) rotate(-24deg);
+    }
+    80% {
+        transform: translateX(-10px) rotate(-26deg);
+    }
+    100% {
+        transform: translateX(0) rotate(-25deg);
+        opacity: 1;
+    }
+}
+
+@keyframes sticker-idle {
+    0% {
+        transform: translateX(0) rotate(-25deg);
+    }
+    25% {
+        transform: translateX(1px) rotate(-21deg);
+    }
+    50% {
+        transform: translateX(-1px) rotate(-24deg);
+    }
+    75% {
+        transform: translateX(1px) rotate(-23deg);
+    }
+    100% {
+        transform: translateX(0) rotate(-25deg);
+    }
+}
+.sticker-flipped {
+    width: 150px;
+    position: absolute;
+
+    top: 50%;
+    left: 58%;
+    transform: translateX(0) rotate(25deg) scaleX(-1);
+    opacity: 1;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.sticker-flipped.slide-in {
+    animation: stop-motion-slide-flipped 1.2s steps(6) forwards;
+}
+
+.sticker-flipped.idle {
+    animation: sticker-flipped-idle 1.2s steps(6) infinite;
+    opacity: 1;
+}
+
+@keyframes stop-motion-slide-flipped {
+    0% {
+        transform: translateX(200px) rotate(25deg) scaleX(-1);
+        opacity: 0;
+    }
+    20% {
+        transform: translateX(150px) rotate(23deg) scaleX(-1);
+        opacity: 1;
+    }
+    40% {
+        transform: translateX(100px) rotate(28deg) scaleX(-1);
+    }
+    60% {
+        transform: translateX(50px) rotate(24deg) scaleX(-1);
+    }
+    80% {
+        transform: translateX(10px) rotate(26deg) scaleX(-1);
+    }
+    100% {
+        transform: translateX(0) rotate(25deg) scaleX(-1);
+        opacity: 1;
+    }
+}
+
+@keyframes sticker-flipped-idle {
+    0% {
+        transform: translateX(0) rotate(25deg) scaleX(-1);
+    }
+    25% {
+        transform: translateX(1px) rotate(21deg) scaleX(-1);
+    }
+    50% {
+        transform: translateX(-1px) rotate(24deg) scaleX(-1);
+    }
+    75% {
+        transform: translateX(1px) rotate(23deg) scaleX(-1);
+    }
+    100% {
+        transform: translateX(0) rotate(25deg) scaleX(-1);
+    }
 }
