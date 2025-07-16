@@ -51,7 +51,6 @@ const CreateBoard = () => {
     const [isStrokeEnabled, setIsStrokeEnabled] = useState(false);
     const [strokeColor, setStrokeColor] = useState("#ffffff");
 
-   
     const [fontWeight, setFontWeight] = useState("normal");
     const [fontStyle, setFontStyle] = useState("normal");
     const [textDecoration, setTextDecoration] = useState("none");
@@ -121,7 +120,7 @@ const CreateBoard = () => {
 
     const pushToHistory = useCallback((newElements) => {
         setHistory((prev) => [...prev, newElements]);
-        setRedoStack([]); 
+        setRedoStack([]);
     }, []);
 
     const handleAddElement = useCallback(
@@ -138,11 +137,11 @@ const CreateBoard = () => {
                     fontWeight: "normal",
                     fontStyle: "normal",
                     textDecoration: "none",
-                })
+                }),
             };
             setElements((prev) => {
                 const newElements = [...prev, newElement];
-                pushToHistory(newElements); 
+                pushToHistory(newElements);
                 return newElements;
             });
         },
@@ -182,7 +181,7 @@ const CreateBoard = () => {
             );
 
             const cloned = JSON.parse(JSON.stringify(newElements));
-            setRedoStack([]); 
+            setRedoStack([]);
             setHistory((prevHistory) => [...prevHistory, cloned]);
 
             return newElements;
@@ -222,10 +221,9 @@ const CreateBoard = () => {
 
     const handleDelete = () => {
         if (!selectedId) return;
-        
-        
+
         setSelectedId(null);
-        
+
         setElements((prev) => {
             const newElements = prev.filter((el) => el.id !== selectedId);
             pushToHistory(newElements);
@@ -236,7 +234,7 @@ const CreateBoard = () => {
     const handleUndo = () => {
         if (history.length === 0) return;
         setSelectedId(null);
-        
+
         const previous = history[history.length - 1];
         setRedoStack((prev) => [...prev, elements]);
         setHistory((prev) => prev.slice(0, -1));
@@ -245,10 +243,9 @@ const CreateBoard = () => {
 
     const handleRedo = () => {
         if (redoStack.length === 0) return;
-        
-       
+
         setSelectedId(null);
-        
+
         const next = redoStack[redoStack.length - 1];
         setRedoStack((prev) => prev.slice(0, -1));
         setHistory((prev) => [...prev, elements]);
@@ -389,16 +386,12 @@ const CreateBoard = () => {
                 [property]: value,
             });
 
-           
-            if (property === 'fontWeight') setFontWeight(value);
-            if (property === 'fontStyle') setFontStyle(value);
-            if (property === 'textDecoration') setTextDecoration(value);
+            if (property === "fontWeight") setFontWeight(value);
+            if (property === "fontStyle") setFontStyle(value);
+            if (property === "textDecoration") setTextDecoration(value);
         }
     };
 
-
-
-    
     useEffect(() => {
         if (isTextSelected && selectedElement) {
             setFontWeight(selectedElement.fontWeight || "normal");
@@ -537,7 +530,10 @@ const CreateBoard = () => {
                                     rotation={element.rotation}
                                     fontWeight={element.fontWeight || "normal"}
                                     fontStyle={element.fontStyle || "normal"}
-                                    textDecoration={element.textDecoration || "none"}
+                                    textDecoration={
+                                        element.textDecoration || "none"
+                                    }
+                                    width={element.width || 200}
                                     onChange={handleTextChange}
                                     onUpdate={handleUpdateElement}
                                     isSelected={isSelected}
