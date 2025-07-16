@@ -472,12 +472,19 @@ const CreateBoard = () => {
                 width={window.innerWidth}
                 height={window.innerHeight}
                 onMouseDown={(e) => {
-                    if (e.target === e.target.getStage()) setSelectedId(null);
+                    const clickedOn = e.target;
+                    if (
+                        clickedOn === clickedOn.getStage() ||
+                        clickedOn.name() === "background"
+                    ) {
+                        setSelectedId(null);
+                    }
                 }}
             >
                 <Layer>
                     {/* 👉 Background layer rendered behind everything */}
                     <Rect
+                        name="background"
                         x={0}
                         y={0}
                         width={window.innerWidth}
