@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Stage, Layer } from "react-konva";
+import { Stage, Layer, Rect } from "react-konva";
 import { v4 as uuidv4 } from "uuid";
 import { useUser } from "../contexts/UserContext";
 
@@ -29,10 +29,11 @@ const today = new Date().toISOString().split("T")[0];
 const CreateBoard = () => {
     const [elements, setElements] = useState([]);
 
-    const [loading, setLoading] = useState(false);
+    const [backgroundColor, setBackgroundColor] = useState({ r: 255, g: 255, b: 255 }); // 👉 NEW
+  const [loading, setLoading] = useState(false);
 
     const { datePath } = useParams();
-    const initialDate = datePath || today; //if no datePath use today's date
+    const initialDate = datePath || today;
     const [date, setDate] = useState(initialDate);
 
     const [selectedId, setSelectedId] = useState(null);
@@ -118,10 +119,11 @@ const CreateBoard = () => {
         }
     }, [user, date]);
 
-    const pushToHistory = useCallback((newElements) => {
-        setHistory((prev) => [...prev, newElements]);
-        setRedoStack([]);
-    }, []);
+  const pushToHistory = useCallback((newElements) => {
+    const clone = JSON.parse(JSON.stringify(newElements));
+    setHistory((prev) => [...prev, clone]);
+    setRedoStack([]);
+  }, []);
 
     const handleAddElement = useCallback(
         (elementType, elementData) => {
@@ -241,16 +243,14 @@ const CreateBoard = () => {
         setElements(previous);
     };
 
-    const handleRedo = () => {
-        if (redoStack.length === 0) return;
-
-        setSelectedId(null);
-
-        const next = redoStack[redoStack.length - 1];
-        setRedoStack((prev) => prev.slice(0, -1));
-        setHistory((prev) => [...prev, elements]);
-        setElements(next);
-    };
+  const handleRedo = () => {
+    if (redoStack.length === 0) return;
+    const next = redoStack[redoStack.length - 1];
+    setRedoStack((prev) => prev.slice(0, -1));
+    setHistory((prev) => [...prev, elements]);
+    setElements(next);
+    setSelectedId(null);
+  };
 
     const handleDeleteBoard = () => {
         if (
@@ -479,46 +479,60 @@ const CreateBoard = () => {
             </label>
             <DatePicker date={date} onDateChange={setDate} />
 
-            <Toolbar
-                onAddText={() => handleAddElement("text", { text: "New Text" })}
-                onAddImage={() => handleAddElement("image")}
-                onUploadingComplete={handleAddImageElement}
-                onUndo={handleUndo}
-                onRedo={handleRedo}
-                onUploadError={(msg) => setError(msg)}
-                onDelete={handleDelete}
-                selectedId={selectedId}
-                onOpenStickerLibrary={() => setShowStickerLibrary(true)}
+      <Toolbar
+        onAddText={() => handleAddElement("text", { text: "New Text" })}
+        onUploadingComplete={handleAddImageElement}
+        onUploadError={(msg) => setError(msg)}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        onDelete={handleDelete}
+        selectedId={selectedId}
+        onOpenStickerLibrary={() => setShowStickerLibrary(true)}
                 onSave={handleSaveBoard}
                 onExport={exportToImage}
                 onDeleteBoard={handleDeleteBoard}
-            />
-            <StickerLibrary
-                isOpen={showStickerLibrary}
-                onClose={() => setShowStickerLibrary(false)}
-                onSelectSticker={(src) => handleAddElement("image", { src })}
-            />
-            <Stage
-                ref={stageRef}
-                width={window.innerWidth}
-                height={window.innerHeight}
-                onMouseDown={(e) => {
-                    const clickedOnEmpty = e.target === e.target.getStage();
-                    if (clickedOnEmpty) setSelectedId(null);
-                }}
-            >
-                <Layer>
-                    {elements.map((element) => {
-                        const isSelected = element.id === selectedId;
-                        if (element.type === "text") {
-                            return (
-                                <EditableText
-                                    key={element.id}
-                                    id={element.id}
-                                    text={element.text}
-                                    x={element.x}
-                                    y={element.y}
-                                    fontFamily={element.fontFamily}
+        canUndo={history.length > 0}
+        canRedo={redoStack.length > 0}
+        onBackgroundColorChange={setBackgroundColor} // 👉 Added
+      />
+
+      <StickerLibrary
+        isOpen={showStickerLibrary}
+        onClose={() => setShowStickerLibrary(false)}
+        onSelectSticker={(src) => handleAddElement("image", { src })}
+      />
+
+      <Stage
+        ref={stageRef}
+        width={window.innerWidth}
+        height={window.innerHeight}
+        onMouseDown={(e) => {
+          if (e.target === e.target.getStage()) setSelectedId(null);
+        }}
+      >
+        <Layer>
+          {/* 👉 Background layer rendered behind everything */}
+          <Rect
+            x={0}
+            y={0}
+            width={window.innerWidth}
+            height={window.innerHeight}
+            fill={`rgb(${backgroundColor.r},${backgroundColor.g},${backgroundColor.b})`}
+          />
+        </Layer>
+
+        <Layer>
+          {elements.map((element) => {
+            const isSelected = element.id === selectedId;
+            if (element.type === "text") {
+              return (
+                <EditableText
+                  key={element.id}
+                  id={element.id}
+                  text={element.text}
+                  x={element.x}
+                  y={element.y}
+                  fontFamily={element.fontFamily}
                                     color={element.color}
                                     stroke={element.stroke || null}
                                     strokeWidth={
@@ -526,61 +540,56 @@ const CreateBoard = () => {
                                             ? element.strokeWidth || 2
                                             : 0
                                     }
-                                    fontSize={element.fontSize || 20}
-                                    rotation={element.rotation}
+                  fontSize={element.fontSize || 20}
+                  rotation={element.rotation}
                                     fontWeight={element.fontWeight || "normal"}
                                     fontStyle={element.fontStyle || "normal"}
                                     textDecoration={
                                         element.textDecoration || "none"
                                     }
                                     width={element.width || 200}
-                                    onChange={handleTextChange}
-                                    onUpdate={handleUpdateElement}
-                                    isSelected={isSelected}
-                                    onSelect={() => setSelectedId(element.id)}
-                                    stageRef={stageRef}
-                                />
-                            );
-                        }
-                        if (element.type === "image") {
-                            return (
-                                <DraggableImage
-                                    key={element.id}
-                                    id={element.id}
-                                    src={element.src}
-                                    x={element.x}
-                                    y={element.y}
-                                    scaleX={element.scaleX}
-                                    scaleY={element.scaleY}
-                                    rotation={element.rotation}
-                                    isSelected={isSelected}
-                                    onSelect={() => setSelectedId(element.id)}
-                                    onUpdate={handleUpdateElement}
-                                />
-                            );
-                        }
-                        return null;
-                    })}
-                </Layer>
-            </Stage>
-            {selectedId && (
-                <ToolbarWrapper
-                    onMoveUp={() => moveLayer("up")}
-                    onMoveDown={() => moveLayer("down")}
-                    onDelete={handleDelete}
-                    isTextSelected={isTextSelected}
-                    selectedFont={
-                        isTextSelected
-                            ? selectedElement?.fontFamily || "Arial"
-                            : undefined
-                    }
-                    onFontChange={(newFont) => {
-                        if (isTextSelected && selectedId) {
-                            handleUpdateElement(selectedId, {
-                                fontFamily: newFont,
-                            });
-                        }
-                    }}
+                  onChange={handleTextChange}
+                  onUpdate={handleUpdateElement}
+                  isSelected={isSelected}
+                  onSelect={() => setSelectedId(element.id)}
+                  stageRef={stageRef}
+                />
+              );
+            }
+            if (element.type === "image") {
+              return (
+                <DraggableImage
+                  key={element.id}
+                  id={element.id}
+                  src={element.src}
+                  x={element.x}
+                  y={element.y}
+                  scaleX={element.scaleX}
+                  scaleY={element.scaleY}
+                  rotation={element.rotation}
+                  isSelected={isSelected}
+                  onSelect={() => setSelectedId(element.id)}
+                  onUpdate={handleUpdateElement}
+                />
+              );
+            }
+            return null;
+          })}
+        </Layer>
+      </Stage>
+
+      {selectedId && (
+        <ToolbarWrapper
+          onMoveUp={() => moveLayer("up")}
+          onMoveDown={() => moveLayer("down")}
+          onDelete={handleDelete}
+          isTextSelected={isTextSelected}
+          selectedFont={isTextSelected ? selectedElement?.fontFamily || "Arial" : undefined}
+          onFontChange={(newFont) => {
+            if (isTextSelected && selectedId) {
+              handleUpdateElement(selectedId, { fontFamily: newFont });
+            }
+          }}
                     selectedColour={
                         isTextSelected
                             ? selectedElement?.color || "#000000"
@@ -601,10 +610,10 @@ const CreateBoard = () => {
                     fontStyle={fontStyle}
                     textDecoration={textDecoration}
                     onFormatChange={handleFormatChange}
-                />
-            )}
-        </div>
-    );
+        />
+      )}
+    </div>
+  );
 };
 
 export default CreateBoard;

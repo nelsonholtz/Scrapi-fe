@@ -17,6 +17,7 @@
     "firebase": "^11.10.0",
     "fontfaceobserver": "^2.3.0",
     "konva": "^9.3.20",
+    "prop-types": "^15.8.1",
     "react": "^19.1.0",
     "react-calendar": "^6.0.0",
     "react-dom": "^19.1.0",
