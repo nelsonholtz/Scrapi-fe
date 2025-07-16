@@ -31,6 +31,8 @@ const TextComponent = forwardRef(
                 fill={color}
                 stroke={stroke}
                 strokeWidth={strokeWidth}
+                wrap="word"
+                width={width}
                 draggable
                 onDblClick={() => onDoubleClick?.({ id, x, y, text })}
                 onDragEnd={(e) => {

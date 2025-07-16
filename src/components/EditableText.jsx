@@ -16,6 +16,7 @@ const EditableText = ({
     fontWeight = "normal",
     fontStyle = "normal",
     textDecoration = "none",
+    width: initialWidth = 200,
     onChange,
     onUpdate,
     stageRef,
@@ -25,24 +26,22 @@ const EditableText = ({
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(text);
     const [localFontSize, setLocalFontSize] = useState(fontSize);
+    const [width, setWidth] = useState(200);
+    const [activeAnchor, setActiveAnchor] = useState(null);
+
     const inputRef = useRef();
     const textRef = useRef();
     const transformerRef = useRef();
 
-  
     const konvaFontStyle = `${fontWeight} ${fontStyle}`.trim();
-
-  
 
     useEffect(() => {
         if (isSelected && transformerRef.current && textRef.current) {
-           
             if (textRef.current.getParent()) {
                 transformerRef.current.nodes([textRef.current]);
                 transformerRef.current.getLayer()?.batchDraw();
             }
         } else if (transformerRef.current) {
-          
             transformerRef.current.nodes([]);
         }
     }, [isSelected]);
@@ -55,6 +54,9 @@ const EditableText = ({
         };
     }, []);
 
+    useEffect(() => {
+        setWidth(initialWidth);
+    }, [initialWidth]);
 
     const handleSelect = () => {
         if (onSelect) onSelect(id);
@@ -62,7 +64,7 @@ const EditableText = ({
 
     const handleDblClick = () => {
         setIsEditing(true);
-        
+
         setTimeout(() => {
             inputRef.current?.focus();
         }, 100);
@@ -83,23 +85,37 @@ const EditableText = ({
         }
     };
 
+    const onTransformStart = (e) => {
+        const tr = transformerRef.current;
+        setActiveAnchor(tr?.getActiveAnchor());
+    };
+
     const handleTransformEnd = () => {
         const node = textRef.current;
         if (!node || !node.getParent()) return;
 
         const scaleX = node.scaleX();
+        const scaleY = node.scaleY();
 
         node.scaleX(1);
         node.scaleY(1);
 
-        const newFontSize = node.fontSize() * scaleX;
-        setLocalFontSize(newFontSize);
+        if (activeAnchor === "middle-right") {
+            const newWidth = Math.max(50, node.width() * scaleX);
+            onUpdate(id, { width: newWidth });
+            setWidth(newWidth);
+        } else {
+            const newFontSize = Math.max(8, node.fontSize() * scaleX);
+            onUpdate(id, { fontSize: newFontSize });
+            setLocalFontSize(newFontSize);
+        }
+
+        setActiveAnchor(null);
 
         onUpdate(id, {
             x: node.x(),
             y: node.y(),
             rotation: node.rotation(),
-            fontSize: newFontSize,
         });
     };
 
@@ -127,7 +143,7 @@ const EditableText = ({
                             color: color,
                             padding: "0px",
                             margin: "0px",
-                            border: "2px solid #007bff",
+                            border: "2px solid #7ccbf8",
                             background: "rgba(255, 255, 255, 0.95)",
                             outline: "none",
                             zIndex: 1000,
@@ -153,6 +169,8 @@ const EditableText = ({
                     fill={color}
                     stroke={stroke}
                     strokeWidth={strokeWidth}
+                    width={width}
+                    wrap="word"
                     draggable
                     onClick={handleSelect}
                     onDblClick={handleDblClick}
@@ -162,20 +180,25 @@ const EditableText = ({
                             y: e.target.y(),
                         });
                     }}
+                    onTransformStart={onTransformStart}
                     onTransformEnd={handleTransformEnd}
                 />
             )}
-           
+
             {!isEditing && textDecoration === "underline" && (
                 <Text
                     x={x}
                     y={y + localFontSize + 2}
                     rotation={rotation}
-                    text={"_".repeat(Math.max(1, Math.floor(text.length * 0.8)))}
+                    text={"_".repeat(
+                        Math.max(1, Math.floor(text.length * 0.8))
+                    )}
                     fontSize={localFontSize * 0.1}
                     fontFamily={fontFamily}
                     fill={color}
                     listening={false}
+                    wrap="word"
+                    width={textProps.width || 200}
                 />
             )}
             {isSelected && (
@@ -187,6 +210,7 @@ const EditableText = ({
                         "top-right",
                         "bottom-left",
                         "bottom-right",
+                        "middle-right",
                     ]}
                 />
             )}
