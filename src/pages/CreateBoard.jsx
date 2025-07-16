@@ -547,110 +547,111 @@ const CreateBoard = () => {
         onClose={() => setShowStickerLibrary(false)}
         onSelectSticker={(src) => handleAddElement("image", { src })}
       />
+      <div className="stage-div">
+        <Stage
+          width={1300}
+          height={800}
+          onMouseDown={(e) => {
+            const clickedOn = e.target;
 
-      <Stage
-        width={window.innerWidth}
-        height={window.innerHeight}
-        onMouseDown={(e) => {
-          const clickedOn = e.target;
-
-          if (isDrawingMode) {
-            handleDrawingMouseDown(e);
-          } else if (
-            clickedOn === clickedOn.getStage() ||
-            clickedOn.name() === "background"
-          ) {
-            setSelectedId(null);
-          }
-        }}
-        ref={stageRef}
-        onMouseMove={handleDrawingMouseMove}
-        onMouseUp={handleDrawingMouseUp}
-      >
-        <Layer>
-          {/* 👉 Background layer rendered behind everything */}
-          <Rect
-            name="background"
-            x={0}
-            y={0}
-            width={window.innerWidth}
-            height={window.innerHeight}
-            fill={`rgb(${backgroundColor.r},${backgroundColor.g},${backgroundColor.b})`}
-          />
-        </Layer>
-        <Layer>
-          {elements.map((element) => {
-            if (element.type === "drawing") {
-              return (
-                <Line
-                  key={element.id}
-                  points={element.points}
-                  stroke="#3d2620ff"
-                  strokeWidth={element.tool === "eraser" ? 20 : 5}
-                  tension={0.5}
-                  lineCap="round"
-                  lineJoin="round"
-                  globalCompositeOperation={
-                    element.tool === "eraser"
-                      ? "destination-out"
-                      : "source-over"
-                  }
-                />
-              );
+            if (isDrawingMode) {
+              handleDrawingMouseDown(e);
+            } else if (
+              clickedOn === clickedOn.getStage() ||
+              clickedOn.name() === "background"
+            ) {
+              setSelectedId(null);
             }
-            return null;
-          })}
-        </Layer>
-        <Layer>
-          {elements.map((element) => {
-            const isSelected = element.id === selectedId;
-            if (element.type === "text") {
-              return (
-                <EditableText
-                  key={element.id}
-                  id={element.id}
-                  text={element.text}
-                  x={element.x}
-                  y={element.y}
-                  fontFamily={element.fontFamily}
-                  color={element.color}
-                  stroke={element.stroke || null}
-                  strokeWidth={element.stroke ? element.strokeWidth || 2 : 0}
-                  fontSize={element.fontSize || 20}
-                  rotation={element.rotation}
-                  fontWeight={element.fontWeight || "normal"}
-                  fontStyle={element.fontStyle || "normal"}
-                  textDecoration={element.textDecoration || "none"}
-                  width={element.width || 200}
-                  onChange={handleTextChange}
-                  onUpdate={handleUpdateElement}
-                  isSelected={isSelected}
-                  onSelect={() => setSelectedId(element.id)}
-                  stageRef={stageRef}
-                />
-              );
-            }
-            if (element.type === "image") {
-              return (
-                <DraggableImage
-                  key={element.id}
-                  id={element.id}
-                  src={element.src}
-                  x={element.x}
-                  y={element.y}
-                  scaleX={element.scaleX}
-                  scaleY={element.scaleY}
-                  rotation={element.rotation}
-                  isSelected={isSelected}
-                  onSelect={() => setSelectedId(element.id)}
-                  onUpdate={handleUpdateElement}
-                />
-              );
-            }
-            return null;
-          })}
-        </Layer>
-      </Stage>
+          }}
+          ref={stageRef}
+          onMouseMove={handleDrawingMouseMove}
+          onMouseUp={handleDrawingMouseUp}
+        >
+          <Layer>
+            {/* 👉 Background layer rendered behind everything */}
+            <Rect
+              name="background"
+              x={0}
+              y={0}
+              width={window.innerWidth}
+              height={window.innerHeight}
+              fill={`rgb(${backgroundColor.r},${backgroundColor.g},${backgroundColor.b})`}
+            />
+          </Layer>
+          <Layer>
+            {elements.map((element) => {
+              if (element.type === "drawing") {
+                return (
+                  <Line
+                    key={element.id}
+                    points={element.points}
+                    stroke="#3d2620ff"
+                    strokeWidth={element.tool === "eraser" ? 20 : 5}
+                    tension={0.5}
+                    lineCap="round"
+                    lineJoin="round"
+                    globalCompositeOperation={
+                      element.tool === "eraser"
+                        ? "destination-out"
+                        : "source-over"
+                    }
+                  />
+                );
+              }
+              return null;
+            })}
+          </Layer>
+          <Layer>
+            {elements.map((element) => {
+              const isSelected = element.id === selectedId;
+              if (element.type === "text") {
+                return (
+                  <EditableText
+                    key={element.id}
+                    id={element.id}
+                    text={element.text}
+                    x={element.x}
+                    y={element.y}
+                    fontFamily={element.fontFamily}
+                    color={element.color}
+                    stroke={element.stroke || null}
+                    strokeWidth={element.stroke ? element.strokeWidth || 2 : 0}
+                    fontSize={element.fontSize || 20}
+                    rotation={element.rotation}
+                    fontWeight={element.fontWeight || "normal"}
+                    fontStyle={element.fontStyle || "normal"}
+                    textDecoration={element.textDecoration || "none"}
+                    width={element.width || 200}
+                    onChange={handleTextChange}
+                    onUpdate={handleUpdateElement}
+                    isSelected={isSelected}
+                    onSelect={() => setSelectedId(element.id)}
+                    stageRef={stageRef}
+                  />
+                );
+              }
+              if (element.type === "image") {
+                return (
+                  <DraggableImage
+                    key={element.id}
+                    id={element.id}
+                    src={element.src}
+                    x={element.x}
+                    y={element.y}
+                    scaleX={element.scaleX}
+                    scaleY={element.scaleY}
+                    rotation={element.rotation}
+                    isSelected={isSelected}
+                    onSelect={() => setSelectedId(element.id)}
+                    onUpdate={handleUpdateElement}
+                  />
+                );
+              }
+              return null;
+            })}
+          </Layer>
+        </Stage>
+      </div>
 
       {selectedId && (
         <ToolbarWrapper

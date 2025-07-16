@@ -91,3 +91,13 @@
 .create-board-page {
   background-image: url("../assets/torn-paper-1.svg");
 }
+
+.stage-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 40px;
+  box-sizing: border-box;
+  background-color: rgb(248, 245, 242);
+}
