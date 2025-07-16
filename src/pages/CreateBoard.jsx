@@ -61,6 +61,8 @@ const CreateBoard = () => {
     const [fontStyle, setFontStyle] = useState("normal");
     const [textDecoration, setTextDecoration] = useState("none");
 
+    const [deleteConfirmation, setDeleteConfirmation] = useState(false);
+
     const stageRef = useRef();
     const { user } = useUser();
 
@@ -258,17 +260,15 @@ const CreateBoard = () => {
     };
 
     const handleDeleteBoard = () => {
-        if (
-            !window.confirm(
-                "Are you sure you want to delete the board? This cannot be undone."
-            )
-        )
-            return;
+        setDeleteConfirmation(true);
+    };
 
+    const handleConfirmDelete = () => {
         setElements([]);
         setHistory([]);
         setRedoStack([]);
         setSelectedId(null);
+        setDeleteConfirmation(false);
     };
 
     const moveLayer = (direction) => {
