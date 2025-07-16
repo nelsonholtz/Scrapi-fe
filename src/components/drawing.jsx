@@ -60,7 +60,7 @@ const DrawingTool = () => {
             <Line
               key={i}
               points={line.points}
-              stroke="#df4b26"
+              stroke="#371209ff"
               strokeWidth={5}
               tension={0.5}
               lineCap="round"

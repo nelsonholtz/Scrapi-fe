@@ -43,7 +43,7 @@ const CreateBoard = () => {
   const [showStickerLibrary, setShowStickerLibrary] = useState(false);
 
   const [tool, setTool] = useState("brush");
-  const [lines, setLines] = useState([]);
+
   const isDrawing = useRef(false);
   const [isDrawingMode, setIsDrawingMode] = useState(false);
 
@@ -77,7 +77,7 @@ const CreateBoard = () => {
   }, [user, date]);
 
   const pushToHistory = useCallback((newElements, newLines) => {
-    setHistory((prev) => [...prev, { elements: newElements, lines: newLines }]);
+    setHistory((prev) => [...prev, { elements: newElements }]);
     setRedoStack([]); // Clear redo stack on new action
   }, []);
 
@@ -94,7 +94,7 @@ const CreateBoard = () => {
       };
       setElements((prev) => {
         const newElements = [...prev, newElement];
-        pushToHistory(newElements, lines); // push the updated array, not old 'elements'
+        pushToHistory(newElements); // push the updated array, not old 'elements'
         return newElements;
       });
     },
@@ -146,7 +146,7 @@ const CreateBoard = () => {
       const newElements = prev.map((el) =>
         el.id === id ? { ...el, ...updates } : el
       );
-      pushToHistory(newElements, lines);
+      pushToHistory(newElements);
       return newElements;
     });
   };
@@ -155,7 +155,7 @@ const CreateBoard = () => {
     if (!selectedId) return;
     setElements((prev) => {
       const newElements = prev.filter((el) => el.id !== selectedId);
-      pushToHistory(newElements, lines);
+      pushToHistory(newElements);
       return newElements;
     });
     setSelectedId(null);
@@ -164,10 +164,10 @@ const CreateBoard = () => {
   const handleUndo = () => {
     if (history.length === 0) return;
     const previous = history[history.length - 1];
-    setRedoStack((prev) => [...prev, { elements, lines }]);
+    setRedoStack((prev) => [...prev, { elements }]);
     setHistory((prev) => prev.slice(0, -1));
     setElements(previous.elements);
-    setLines(previous.lines);
+
     setSelectedId(null);
   };
 
@@ -176,10 +176,10 @@ const CreateBoard = () => {
 
     const next = redoStack[redoStack.length - 1];
     setRedoStack((prev) => prev.slice(0, -1));
-    setHistory((prev) => [...prev, { elements, lines }]);
+    setHistory((prev) => [...prev, { elements }]);
 
     setElements(next.elements);
-    setLines(next.lines);
+
     setSelectedId(null);
   };
 
@@ -195,13 +195,24 @@ const CreateBoard = () => {
     setHistory([]);
     setRedoStack([]);
     setSelectedId(null);
-    setLines([]);
   };
   const handleDrawingMouseDown = (e) => {
     if (!isDrawingMode) return;
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
-    setLines((prevLines) => [...prevLines, { tool, points: [pos.x, pos.y] }]);
+
+    const newLine = {
+      id: uuidv4(),
+      type: "drawing",
+      tool,
+      points: [pos.x, pos.y],
+    };
+
+    setElements((prev) => {
+      const updated = [...prev, newLine];
+      pushToHistory(updated);
+      return updated;
+    });
   };
 
   const handleDrawingMouseMove = (e) => {
@@ -210,11 +221,17 @@ const CreateBoard = () => {
     const stage = e.target.getStage();
     const point = stage.getPointerPosition();
 
-    setLines((prevLines) => {
-      const lastLine = { ...prevLines[prevLines.length - 1] };
-      lastLine.points = lastLine.points.concat([point.x, point.y]);
-      const newLines = [...prevLines.slice(0, -1), lastLine];
-      return newLines;
+    setElements((prev) => {
+      const last = prev[prev.length - 1];
+      if (last.type !== "drawing") return prev;
+
+      const updatedLast = {
+        ...last,
+        points: [...last.points, point.x, point.y],
+      };
+
+      const updated = [...prev.slice(0, -1), updatedLast];
+      return updated;
     });
   };
 
@@ -235,7 +252,7 @@ const CreateBoard = () => {
       const [movedElement] = newElements.splice(index, 1);
       newElements.splice(newIndex, 0, movedElement);
 
-      pushToHistory(newElements, lines);
+      pushToHistory(newElements);
       return newElements;
     });
   };
@@ -436,37 +453,36 @@ const CreateBoard = () => {
         onSelectSticker={(src) => handleAddElement("image", { src })}
       />
       <Stage
-        ref={stageRef}
         width={window.innerWidth}
         height={window.innerHeight}
-        onMouseDown={(e) => {
-          const clickedOnEmpty = e.target === e.target.getStage();
-          if (clickedOnEmpty) setSelectedId(null);
-          handleDrawingMouseDown(e);
-        }}
+        ref={stageRef}
+        onMouseDown={handleDrawingMouseDown}
         onMouseMove={handleDrawingMouseMove}
         onMouseUp={handleDrawingMouseUp}
-        onTouchStart={handleDrawingMouseDown}
-        onTouchMove={handleDrawingMouseMove}
-        onTouchEnd={handleDrawingMouseUp}
       >
         <Layer>
-          {lines.map((line, i) => (
-            <Line
-              key={i}
-              points={line.points}
-              stroke="#df4b26"
-              strokeWidth={tool === "eraser" ? 20 : 5}
-              tension={0.5}
-              lineCap="round"
-              lineJoin="round"
-              globalCompositeOperation={
-                line.tool === "eraser" ? "destination-out" : "source-over"
-              }
-            />
-          ))}
+          {elements.map((element) => {
+            if (element.type === "drawing") {
+              return (
+                <Line
+                  key={element.id}
+                  points={element.points}
+                  stroke="#3d2620ff"
+                  strokeWidth={element.tool === "eraser" ? 20 : 5}
+                  tension={0.5}
+                  lineCap="round"
+                  lineJoin="round"
+                  globalCompositeOperation={
+                    element.tool === "eraser"
+                      ? "destination-out"
+                      : "source-over"
+                  }
+                />
+              );
+            }
+            return null;
+          })}
         </Layer>
-
         <Layer>
           {elements.map((element) => {
             const isSelected = element.id === selectedId;
