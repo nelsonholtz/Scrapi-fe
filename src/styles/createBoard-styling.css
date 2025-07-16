@@ -27,10 +27,28 @@
 .toggle-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   cursor: pointer;
-  font-size: 16px;
-  position: relative;
+  font-size: 14px;
+  position: fixed;
+  top: 130px;
+  left: 13px;
+  padding: 10px 14px;
+  background-color: #ffffffee;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  border: 2px black;
+  font-family: "Inter", sans-serif;
+  transition: all 0.2s ease;
+}
+
+.toggle-container:hover {
+  background-color: #f4f4f5;
+}
+
+.toggle-container:active {
+  background-color: #e4e4e7;
 }
 
 .toggle-checkbox {

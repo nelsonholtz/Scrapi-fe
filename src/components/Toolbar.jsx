@@ -3,6 +3,9 @@ import { FaUndo } from "react-icons/fa";
 import { FaRedo } from "react-icons/fa";
 import { BsTextareaT } from "react-icons/bs";
 import { RiEmojiStickerLine } from "react-icons/ri";
+import { CgExport } from "react-icons/cg";
+import { FiSave } from "react-icons/fi";
+import { RiDeleteBin2Line } from "react-icons/ri";
 
 import ImageUploader from "./ImageUploader";
 
@@ -11,11 +14,14 @@ const Toolbar = ({
   onUndo,
   onRedo,
   onDelete,
+  onDeleteBoard,
   selectedId,
   onUploadError,
   onUploadingComplete,
   onUploadingStart,
   onUploadingEnd,
+  onSave,
+  onExport,
   onOpenStickerLibrary,
   canUndo,
   canRedo,
@@ -56,6 +62,21 @@ const Toolbar = ({
         <li>
           <button className="toolbar-button" onClick={onOpenStickerLibrary}>
             <RiEmojiStickerLine />
+          </button>
+        </li>
+        <li>
+          <button className="toolbar-button" onClick={onSave}>
+            <FiSave />
+          </button>
+        </li>
+        <li>
+          <button className="toolbar-button" onClick={onExport}>
+            <CgExport />
+          </button>
+        </li>
+        <li>
+          <button className="toolbar-button" onClick={onDeleteBoard}>
+            <RiDeleteBin2Line />
           </button>
         </li>
         <li>
