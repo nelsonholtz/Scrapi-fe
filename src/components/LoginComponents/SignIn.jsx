@@ -16,6 +16,8 @@ const SignIn = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
 
   const handleSignIn = (e) => {
@@ -83,15 +85,21 @@ const SignIn = () => {
           required
         />
         <label>Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Loading..." : "Sign In"}
-        </button>
+        <div className="password-input-wrapper">
+          <input
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            className="show-password-btn"
+            onClick={() => setShowPassword((prev) => !prev)}
+          >
+            {showPassword ? "Hide password" : "Show password"}
+          </button>
+        </div>
 
         <div className="link-container">
           <Link to="/createprofile" className="create-profile-link">
