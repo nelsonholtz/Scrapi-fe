@@ -96,22 +96,16 @@ body {
 }
 
 /* Logout Button */
-.logout-button {
-  background-color: #b87474e5;
-  color: rgb(255, 255, 255);
-  border: none;
-  padding: 12px 20px;
-  font-size: 1rem;
-  border-radius: 8px;
+.logout-link {
+  margin-top: 20px;
+  color: #007bff;
+  text-decoration: none;
+  font-size: 16px;
   cursor: pointer;
-  display: block;
-  margin: 30px auto;
-  font-weight: 500;
-  width: 200px;
 }
 
-.logout-button:hover {
-  background-color: rgb(176, 125, 142);
+.logout-link:hover {
+  text-decoration: underline;
 }
 
 /* Responsive */

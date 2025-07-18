@@ -5,10 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
 import "./auth.css";
 const LogOut = () => {
-    const { user, setUser } = useUser();
-    const [message, setMessage] = useState("");
-    const navigate = useNavigate();
-
+  const { user, setUser } = useUser();
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   if (!user) return null;
 
@@ -27,11 +26,10 @@ const LogOut = () => {
       });
   };
 
-
   return (
-    <button onClick={handleLogOut} className="logout-button">
+    <a href="#" onClick={handleLogOut} className="logout-link">
       Log Out
-    </button>
+    </a>
   );
 };
 

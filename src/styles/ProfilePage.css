@@ -325,3 +325,13 @@
   cursor: pointer;
   margin-top: 8px;
 }
+
+.your-scrapbook {
+  font-family: "Patrick Hand";
+  padding: 20px;
+  margin: 0;
+  font-size: 2rem;
+  font-weight: normal;
+  color: #333;
+  text-align: left;
+}
