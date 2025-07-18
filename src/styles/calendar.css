@@ -15,7 +15,7 @@
 
 .react-calendar__navigation {
   display: flex;
-  height: 100px;
+  height: 60px;
   margin-bottom: 16px;
 
   padding: 5px;
@@ -50,7 +50,7 @@
 .calendar-note-indicator {
   font-size: 20px;
   margin-top: 15px;
-  color: rgb(154, 78, 110);
+  color: rgb(148, 78, 154);
 }
 
 .react-calendar__tile:enabled:hover,
@@ -68,6 +68,8 @@
   font-size: 13px;
   color: rgb(154, 78, 110);
   background: transparent;
+  height: 60px;
+  padding-top: 10px;
 }
 
 .react-calendar__navigation button:enabled:hover,

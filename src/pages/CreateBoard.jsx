@@ -256,7 +256,7 @@ const CreateBoard = () => {
     setSelectedId(null);
 
     const previous = history[history.length - 1];
-    setRedoStack((prev) => [...prev, { elements }]);
+    setRedoStack((prev) => [...prev, [...elements]]);
     setHistory((prev) => prev.slice(0, -1));
     setElements(previous);
   };
@@ -266,9 +266,9 @@ const CreateBoard = () => {
 
     const next = redoStack[redoStack.length - 1];
     setRedoStack((prev) => prev.slice(0, -1));
-    setHistory((prev) => [...prev, { elements }]);
+    setHistory((prev) => [...prev, [...elements]]);
 
-    setElements(next.elements);
+    setElements(next);
 
     setSelectedId(null);
   };

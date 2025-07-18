@@ -85,7 +85,7 @@ const AllUserBoards = ({ user }) => {
 
   return (
     <div>
-      <h2>Your Scrapbooks</h2>
+      <div className="your-scrapbook">Your Scrapbooks</div>
       {error && <div className="error-message">{error}</div>}
       {boards.length === 0 ? (
         <p>You haven't created any boards yet!</p>
