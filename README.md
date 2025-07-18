@@ -65,3 +65,5 @@ npm run dev
 ```bash
 npm run build
 ```
+
+This project was built as part of a Northcoders group product by Nelson ([nelsonholtz](https://github.com/nelsonholtz)), Inna ([InnaLiu07](https://github.com/InnaLiu07)), Connie ([Cornie98](https://github.com/Cornie98)), and Leroy ([LeroyHJ](https://github.com/LeroyHJ)).
